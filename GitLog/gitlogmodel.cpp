@@ -9,8 +9,6 @@ GitLogModel::GitLogModel(QObject *parent): QAbstractItemModel(parent)
     initLibQGit2();
 
     repo = new LibQGit2::Repository();
-
-    openRepository("~");
 }
 
 GitLogModel::~GitLogModel()
