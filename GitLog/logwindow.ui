@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>439</height>
+    <width>692</width>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,13 +16,14 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTreeView" name="logView"/>
-    </item>
-    <item>
-     <widget class="QTextEdit" name="commitMessage"/>
-    </item>
-    <item>
-     <widget class="QTreeView" name="commitView"/>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QTreeView" name="logView"/>
+      <widget class="QTextEdit" name="commitMessage"/>
+      <widget class="QTreeView" name="commitView"/>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -31,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>680</width>
+     <width>692</width>
      <height>25</height>
     </rect>
    </property>

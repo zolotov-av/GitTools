@@ -30,6 +30,7 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
+    connect(ui->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
     connect(ui->logView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(logViewColumnResized(int,int,int)));
     connect(ui->commitView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(commitViewColumnResized(int,int,int)));
 
@@ -68,6 +69,7 @@ LogWindow::LogWindow(QWidget *parent) :
         }
     }
 
+    ui->splitter->restoreState(cache->value("window/splitter").toByteArray());
 
     QString path = cache->value("repo/path", "").toString();
     if ( path != "" )
@@ -116,6 +118,11 @@ void LogWindow::commitSelected(const QModelIndex &index)
 void LogWindow::fileClicked(const QModelIndex &index)
 {
     filesModel->execute(index);
+}
+
+void LogWindow::splitterMoved(int pos, int index)
+{
+    cache->setValue("window/splitter", ui->splitter->saveState());
 }
 
 void LogWindow::logViewColumnResized(int index, int oldSize, int newSize)

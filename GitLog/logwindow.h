@@ -31,6 +31,7 @@ private slots:
     void commitSelected(const QModelIndex &index);
     void fileClicked(const QModelIndex &index);
 
+    void splitterMoved(int pos, int index);
     void logViewColumnResized(int index, int oldSize, int newSize);
     void commitViewColumnResized(int index, int oldSize, int newSize);
 
