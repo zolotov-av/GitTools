@@ -80,6 +80,13 @@ namespace LibQGit2
             TreeEntry entryByName(const QString& fileName) const;
 
             /**
+             * Lookup a tree entry by its filename
+             * @param filename the filename of the desired entry
+             * @return the tree entry; NULL if not found
+             */
+            TreeEntry entryByPath(const QString& path) const;
+
+            /**
              * Lookup a tree entry by its position in the tree
              * @param idx the position in the entry list
              * @return the tree entry; NULL if not found

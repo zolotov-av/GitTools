@@ -216,7 +216,11 @@ void GitCommitFiles::execute(const QModelIndex &index)
 
 void GitCommitFiles::showDelta(DiffDelta delta)
 {
-    TreeEntry te = commit.parent(0).tree().entryByName(delta.oldFile().path());
+    qDebug() << "parent count: " << commit.parentCount();
+    qDebug() << "old file: " << delta.oldFile().path();
+    qDebug() << "new file: " << delta.newFile().path();
+    TreeEntry te = commit.parent(0).tree().entryByPath(delta.oldFile().path());
+    qDebug() << "te = " << te.name();
     git_blob *blob = NULL;
     int error = git_blob_lookup(&blob, repo->data(), te.oid().data());
     qDebug() << "git_blob_lookup() = " << error;
@@ -226,7 +230,7 @@ void GitCommitFiles::showDelta(DiffDelta delta)
     }
     Blob oldBlob(blob);
 
-    te = commit.tree().entryByName(delta.oldFile().path());
+    te = commit.tree().entryByPath(delta.oldFile().path());
     error = git_blob_lookup(&blob, repo->data(), te.oid().data());
     qDebug() << "git_blob_lookup() = " << error;
     if ( error != 0 )

@@ -58,6 +58,17 @@ TreeEntry Tree::entryByName(const QString& fileName) const
     return TreeEntry(git_tree_entry_byname(constData(), PathCodec::toLibGit2(fileName)));
 }
 
+TreeEntry Tree::entryByPath(const QString &path) const
+{
+    git_tree_entry *out;
+    int status = git_tree_entry_bypath(&out, constData(), PathCodec::toLibGit2(path));
+    if ( status != 0 )
+    {
+        out = 0;
+    }
+    return TreeEntry(out);
+}
+
 TreeEntry Tree::entryByIndex(int idx) const
 {
     return TreeEntry(git_tree_entry_byindex(data(), idx));
