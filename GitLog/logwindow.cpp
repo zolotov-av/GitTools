@@ -30,6 +30,8 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
+    connect(ui->logView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(logViewColumnResized(int,int,int)));
+    connect(ui->commitView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(commitViewColumnResized(int,int,int)));
 
     if ( cache->value("window/maximized", "no").toString() == "yes" )
     {
@@ -45,6 +47,27 @@ LogWindow::LogWindow(QWidget *parent) :
         }
 
     }
+
+    auto header = ui->logView->header();
+    for(int i = 0; i < 3; i++)
+    {
+        int size = cache->value(QString("LogView/size%1").arg(i), -1).toInt();
+        if ( size > 0 )
+        {
+            header->resizeSection(i, size);
+        }
+    }
+
+    header = ui->commitView->header();
+    for(int i = 0; i < 3; i++)
+    {
+        int size = cache->value(QString("CommitView/size%1").arg(i), -1).toInt();
+        if ( size > 0 )
+        {
+            header->resizeSection(i, size);
+        }
+    }
+
 
     QString path = cache->value("repo/path", "").toString();
     if ( path != "" )
@@ -93,6 +116,16 @@ void LogWindow::commitSelected(const QModelIndex &index)
 void LogWindow::fileClicked(const QModelIndex &index)
 {
     filesModel->execute(index);
+}
+
+void LogWindow::logViewColumnResized(int index, int oldSize, int newSize)
+{
+    cache->setValue(QString("LogView/size%1").arg(index), newSize);
+}
+
+void LogWindow::commitViewColumnResized(int index, int oldSize, int newSize)
+{
+    cache->setValue(QString("CommitView/size%1").arg(index), newSize);
 }
 
 void LogWindow::resizeEvent(QResizeEvent *event)
