@@ -163,7 +163,7 @@ QVariant GitCommitFiles::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void GitCommitFiles::open(const Commit &commit, LibQGit2::Repository *repo)
+void GitCommitFiles::open(LibQGit2::Repository *repo, const Commit &commit)
 {
     this->beginResetModel();
     this->commit = commit;

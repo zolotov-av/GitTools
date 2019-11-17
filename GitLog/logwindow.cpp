@@ -1,12 +1,15 @@
 #include "logwindow.h"
 #include "ui_logwindow.h"
 
-#include "gitlogview.h"
+#include "gitlogmodel.h"
+#include "gitcommitfiles.h"
 
 #include <QDebug>
 #include <QDir>
 #include <QFileDialog>
 #include <QResizeEvent>
+
+using namespace LibQGit2;
 
 LogWindow::LogWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,10 +20,16 @@ LogWindow::LogWindow(QWidget *parent) :
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
 
-    logView = new GitLogView(this);
-    ui->verticalLayout->addWidget(logView);
+    logModel = new GitLogModel(this);
+    logModel->setRepository(repo);
+    ui->logView->setModel(logModel);
+
+    filesModel = new GitCommitFiles(this);
+    ui->commitView->setModel(filesModel);
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
+    connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
+    connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
 
     if ( cache->value("window/maximized", "no").toString() == "yes" )
     {
@@ -40,13 +49,14 @@ LogWindow::LogWindow(QWidget *parent) :
     QString path = cache->value("repo/path", "").toString();
     if ( path != "" )
     {
-        logView->openRepository(path);
+        openRepository(path);
     }
 }
 
 LogWindow::~LogWindow()
 {
     delete ui;
+    delete repo;
 }
 
 void LogWindow::openRepository()
@@ -54,11 +64,35 @@ void LogWindow::openRepository()
     qDebug() << "openRepository";
     QString path = QFileDialog::getExistingDirectory(this, "Choose repository");
 
-    if ( logView->openRepository(path) )
+    openRepository(path);
+}
+
+void LogWindow::openRepository(const QString &path)
+{
+    if ( repo->open(path) )
     {
         cache->setValue("repo/path", path);
+        logModel->open(repo->head());
+    }
+}
+
+void LogWindow::commitSelected(const QModelIndex &index)
+{
+    if ( !index.isValid() )
+    {
+        return;
     }
 
+    Commit commit = logModel->getCommit(index);
+
+    QString message = QString("SHA-1: %1\n\n%2").arg(QString(commit.oid().format())).arg(commit.message());
+    ui->commitMessage->setText(message);
+    filesModel->open(repo, commit);
+}
+
+void LogWindow::fileClicked(const QModelIndex &index)
+{
+    filesModel->execute(index);
 }
 
 void LogWindow::resizeEvent(QResizeEvent *event)

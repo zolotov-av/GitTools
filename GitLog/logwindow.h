@@ -3,12 +3,15 @@
 
 #include <QMainWindow>
 #include <QSettings>
+#include <qgit2e.h>
 
 namespace Ui {
 class LogWindow;
 }
 
 class GitLogView;
+class GitLogModel;
+class GitCommitFiles;
 
 class LogWindow : public QMainWindow
 {
@@ -21,6 +24,12 @@ public:
 public slots:
 
     void openRepository();
+    void openRepository(const QString &path);
+
+private slots:
+
+    void commitSelected(const QModelIndex &index);
+    void fileClicked(const QModelIndex &index);
 
 protected:
 
@@ -31,7 +40,11 @@ private:
     Ui::LogWindow *ui;
 
     QSettings *cache;
+    GitLogModel *logModel;
+    GitCommitFiles *filesModel;
     GitLogView *logView;
+
+    LibQGit2::Repository *repo = new LibQGit2::Repository();
 
 };
 

@@ -17,6 +17,8 @@ public:
     GitLogModel(QObject *parent);
     ~GitLogModel() override;
 
+    void setRepository(LibQGit2::Repository *repo);
+
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent) const override;
 
@@ -25,13 +27,11 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    bool openRepository(const QString &path);
-
     bool open(const LibQGit2::Reference& reference);
 
     LibQGit2::Commit getCommit(const QModelIndex &index);
 
-    LibQGit2::Repository *repo;
+    LibQGit2::Repository *repo = nullptr;
 
 protected:
 

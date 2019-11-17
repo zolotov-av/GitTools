@@ -26,14 +26,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         logwindow.cpp \
-    gitlogview.cpp \
     gitlogmodel.cpp \
     gitcommitfiles.cpp \
     gitdiffprocess.cpp
 
 HEADERS += \
         logwindow.h \
-    gitlogview.h \
     gitlogmodel.h \
     gitcommitfiles.h \
     gitdiffprocess.h

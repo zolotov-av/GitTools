@@ -14,7 +14,17 @@
    <string>LogWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout"/>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTreeView" name="logView"/>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="commitMessage"/>
+    </item>
+    <item>
+     <widget class="QTreeView" name="commitView"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

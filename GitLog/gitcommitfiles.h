@@ -19,7 +19,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    void open(const LibQGit2::Commit &commit, LibQGit2::Repository *repo);
+    void open(LibQGit2::Repository *repo, const LibQGit2::Commit &commit);
     void close();
 
     void execute(const QModelIndex &index);

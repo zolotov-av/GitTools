@@ -6,12 +6,15 @@ using namespace LibQGit2;
 
 GitLogModel::GitLogModel(QObject *parent): QAbstractItemModel(parent)
 {
-    repo = new LibQGit2::Repository();
 }
 
 GitLogModel::~GitLogModel()
 {
-    delete repo;
+}
+
+void GitLogModel::setRepository(Repository *repo)
+{
+    this->repo = repo;
 }
 
 int GitLogModel::rowCount(const QModelIndex &parent) const
@@ -91,24 +94,6 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
-}
-
-bool GitLogModel::openRepository(const QString &path)
-{
-    qDebug() << QString("GitLogModel::openRepository(%1)").arg(path);
-    if ( repo->open(path) )
-    {
-        Reference head = repo->head();
-
-        qDebug() << "head: " << head.name();
-
-        open(head);
-
-        return true;
-    }
-
-    clear();
-    return false;
 }
 
 bool GitLogModel::open(const Reference& reference)
