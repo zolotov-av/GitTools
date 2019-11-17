@@ -6,16 +6,12 @@ using namespace LibQGit2;
 
 GitLogModel::GitLogModel(QObject *parent): QAbstractItemModel(parent)
 {
-    initLibQGit2();
-
     repo = new LibQGit2::Repository();
 }
 
 GitLogModel::~GitLogModel()
 {
     delete repo;
-
-    shutdownLibQGit2();
 }
 
 int GitLogModel::rowCount(const QModelIndex &parent) const
