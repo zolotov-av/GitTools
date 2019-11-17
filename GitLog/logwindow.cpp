@@ -5,6 +5,7 @@
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QDir>
 
 LogWindow::LogWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,11 +13,19 @@ LogWindow::LogWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
+    qDebug() << cache->fileName();
+
     logView = new GitLogView(this);
     ui->verticalLayout->addWidget(logView);
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
 
+    QString path = cache->value("repo/path", "").toString();
+    if ( path != "" )
+    {
+        logView->openRepository(path);
+    }
 }
 
 LogWindow::~LogWindow()
@@ -31,7 +40,7 @@ void LogWindow::openRepository()
 
     if ( logView->openRepository(path) )
     {
-
+        cache->setValue("repo/path", path);
     }
 
 }

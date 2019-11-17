@@ -2,6 +2,7 @@
 #define LOGWINDOW_H
 
 #include <QMainWindow>
+#include <QSettings>
 
 namespace Ui {
 class LogWindow;
@@ -24,6 +25,7 @@ public slots:
 private:
     Ui::LogWindow *ui;
 
+    QSettings *cache;
     GitLogView *logView;
 
 };
