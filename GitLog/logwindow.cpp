@@ -29,6 +29,7 @@ LogWindow::LogWindow(QWidget *parent) :
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
+    connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
     connect(ui->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
     connect(ui->logView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(logViewColumnResized(int,int,int)));
@@ -133,6 +134,12 @@ void LogWindow::logViewColumnResized(int index, int oldSize, int newSize)
 void LogWindow::commitViewColumnResized(int index, int oldSize, int newSize)
 {
     cache->setValue(QString("CommitView/size%1").arg(index), newSize);
+}
+
+void LogWindow::onActivate(const QModelIndex &index)
+{
+    qDebug() << "activated " << index.row();
+    ui->commitView->setFocus();
 }
 
 void LogWindow::resizeEvent(QResizeEvent *event)

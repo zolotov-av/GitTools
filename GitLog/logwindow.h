@@ -35,6 +35,8 @@ private slots:
     void logViewColumnResized(int index, int oldSize, int newSize);
     void commitViewColumnResized(int index, int oldSize, int newSize);
 
+    void onActivate(const QModelIndex &index);
+
 protected:
 
     void resizeEvent(QResizeEvent *event) override;
