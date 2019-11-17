@@ -4,8 +4,9 @@
 #include "gitlogview.h"
 
 #include <QDebug>
-#include <QFileDialog>
 #include <QDir>
+#include <QFileDialog>
+#include <QResizeEvent>
 
 LogWindow::LogWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,6 +21,21 @@ LogWindow::LogWindow(QWidget *parent) :
     ui->verticalLayout->addWidget(logView);
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
+
+    if ( cache->value("window/maximized", "no").toString() == "yes" )
+    {
+        this->showMaximized();
+    }
+    else
+    {
+        int width = cache->value("window/width", -1).toInt();
+        int height = cache->value("window/height", -1).toInt();
+        if ( width > 0 && height >= 0 )
+        {
+            resize(width, height);
+        }
+
+    }
 
     QString path = cache->value("repo/path", "").toString();
     if ( path != "" )
@@ -43,4 +59,11 @@ void LogWindow::openRepository()
         cache->setValue("repo/path", path);
     }
 
+}
+
+void LogWindow::resizeEvent(QResizeEvent *event)
+{
+    cache->setValue("window/maximized", isMaximized() ? "yes" : "no");
+    cache->setValue("window/width", event->size().width());
+    cache->setValue("window/height", event->size().height());
 }

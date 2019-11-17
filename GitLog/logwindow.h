@@ -22,6 +22,11 @@ public slots:
 
     void openRepository();
 
+protected:
+
+    void resizeEvent(QResizeEvent *event) override;
+
+
 private:
     Ui::LogWindow *ui;
 
