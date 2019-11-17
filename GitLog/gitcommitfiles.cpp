@@ -181,6 +181,13 @@ void GitCommitFiles::open(const Commit &commit, LibQGit2::Repository *repo)
     this->endResetModel();
 }
 
+void GitCommitFiles::close()
+{
+    beginResetModel();
+    active = false;
+    endResetModel();
+}
+
 void GitCommitFiles::execute(const QModelIndex &index)
 {
     if ( !index.isValid() )

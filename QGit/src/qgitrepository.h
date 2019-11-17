@@ -1,7 +1,8 @@
 /******************************************************************************
- * This file is part of the libqgit2 library
+ * This file is part of the libqgit2e library, fork of libqgit2
  * Copyright (c) 2011 Laszlo Papp <djszapi@archlinux.us>
  * Copyright (C) 2013 Leonardo Giordani
+ * Copyright (c) 2019 Alex V. Zolotov <shade@shamangrad.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -135,37 +136,9 @@ namespace LibQGit2
             /**
              * Open a git repository.
              *
-             * The 'path' argument must point to an existing git repository
-             * folder, e.g.
-             *
-             * /path/to/my_repo/.git/ (normal repository)
-             * objects/
-             * index
-             * HEAD
-             *
-             * /path/to/bare_repo/ (bare repository)
-             * objects/
-             * index
-             * HEAD
-             *
-             * The method will automatically detect if 'path' is a normal
-             * or bare repository or fail is 'path' is neither.
-             *
              * @param path the path to the repository
-             * @throws LibQGit2::Exception
              */
-            void open(const QString& path);
-
-            /**
-             * Convenience function for finding and opening a git repository.
-             *
-             * Calls discover() with the given arguments, and passes the result to open().
-             *
-             * @throws LibQGit2::Exception
-             */
-            void discoverAndOpen(const QString &startPath,
-                                 bool acrossFs = false,
-                                 const QStringList &ceilingDirs = QStringList());
+            bool open(const QString& path) noexcept;
 
             /**
              * Retrieve and resolve the reference pointed at by HEAD.

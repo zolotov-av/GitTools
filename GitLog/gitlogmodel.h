@@ -25,7 +25,8 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    //bool open(const QString& ref);
+    bool openRepository(const QString &path);
+
     bool open(const LibQGit2::Reference& reference);
 
     LibQGit2::Commit getCommit(const QModelIndex &index);
@@ -36,6 +37,8 @@ protected:
 
 
     QVector<LibQGit2::Commit> history;
+
+    void clear();
 };
 
 #endif // GITLOGMODEL_H

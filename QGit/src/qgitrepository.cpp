@@ -1,7 +1,8 @@
 /******************************************************************************
- * This file is part of the libqgit2 library
+ * This file is part of the libqgit2e library, fork of libqgit2
  * Copyright (c) 2011 Laszlo Papp <djszapi@archlinux.us>
  * Copyright (C) 2013 Leonardo Giordani
+ * Copyright (c) 2019 Alex V. Zolotov <shade@shamangrad.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,12 +76,18 @@ public:
         setData(repo);
     }
 
-    void open(const QString& path)
+    bool open(const QString& path) noexcept
     {
         d.clear();
         git_repository *repo = 0;
-        qGitThrow(git_repository_open(&repo, PathCodec::toLibGit2(path)));
-        setData(repo);
+        int status = git_repository_open(&repo, PathCodec::toLibGit2(path));
+        if ( status == 0 )
+        {
+            setData(repo);
+            return true;
+        }
+
+        return false;
     }
 
     void setData(git_repository *repo)
@@ -140,16 +147,16 @@ void Repository::init(const QString& path, bool isBare)
     d_ptr->init(path, isBare);
 }
 
-void Repository::open(const QString& path)
+bool Repository::open(const QString& path) noexcept
 {
-    d_ptr->open(path);
-}
+    internal::Buffer repoPath;
+    int status = git_repository_discover(repoPath.data(), PathCodec::toLibGit2(path), false, nullptr);
+    if ( status == 0 )
+    {
+        return d_ptr->open(repoPath.asPath());
+    }
 
-void Repository::discoverAndOpen(const QString &startPath,
-                                     bool acrossFs,
-                                     const QStringList &ceilingDirs)
-{
-    open(discover(startPath, acrossFs, ceilingDirs));
+    return false;
 }
 
 Reference Repository::head() const

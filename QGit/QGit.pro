@@ -1,6 +1,7 @@
 TEMPLATE = lib
 CONFIG += staticlib
 
+HEADERS+=qgit2e.h
 HEADERS+=src/private/annotatedcommit.h
 HEADERS+=src/private/buffer.h
 HEADERS+=src/private/pathcodec.h

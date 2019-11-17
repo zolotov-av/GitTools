@@ -10,13 +10,7 @@ GitLogModel::GitLogModel(QObject *parent): QAbstractItemModel(parent)
 
     repo = new LibQGit2::Repository();
 
-    repo->open("/home/alex/prj/QT/circles");
-
-    Reference head = repo->head();
-
-    qDebug() << "head: " << head.name();
-
-    open(head);
+    openRepository("~");
 }
 
 GitLogModel::~GitLogModel()
@@ -105,8 +99,27 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+bool GitLogModel::openRepository(const QString &path)
+{
+    qDebug() << QString("GitLogModel::openRepository(%1)").arg(path);
+    if ( repo->open(path) )
+    {
+        Reference head = repo->head();
+
+        qDebug() << "head: " << head.name();
+
+        open(head);
+
+        return true;
+    }
+
+    clear();
+    return false;
+}
+
 bool GitLogModel::open(const Reference& reference)
 {
+    beginResetModel();
     Commit commit;
     RevWalk revwalk(*repo);
     revwalk.push(reference);
@@ -115,8 +128,16 @@ bool GitLogModel::open(const Reference& reference)
     {
         history.append(commit);
     }
+    endResetModel();
 
     return true;
+}
+
+void GitLogModel::clear()
+{
+    beginResetModel();
+    history.clear();
+    endResetModel();
 }
 
 Commit GitLogModel::getCommit(const QModelIndex &index)

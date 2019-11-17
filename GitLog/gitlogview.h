@@ -17,6 +17,8 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
+    bool openRepository(const QString &path);
+
 protected:
 
     GitLogModel *model;

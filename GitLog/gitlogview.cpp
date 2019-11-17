@@ -46,6 +46,11 @@ QSize GitLogView::sizeHint() const
     return QSize(400, 200);
 }
 
+bool GitLogView::openRepository(const QString &path)
+{
+    return model->openRepository(path);
+}
+
 void GitLogView::paintEvent(QPaintEvent * /* event */)
 {
     /*

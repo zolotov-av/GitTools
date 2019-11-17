@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>680</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,10 +21,17 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>680</width>
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menurepo">
+    <property name="title">
+     <string>&amp;Repo</string>
+    </property>
+    <addaction name="actionRepoOpen"/>
+   </widget>
+   <addaction name="menurepo"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -35,6 +42,14 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionRepoOpen">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

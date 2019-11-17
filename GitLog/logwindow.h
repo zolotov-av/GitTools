@@ -17,10 +17,15 @@ public:
     explicit LogWindow(QWidget *parent = 0);
     ~LogWindow();
 
+public slots:
+
+    void openRepository();
+
 private:
     Ui::LogWindow *ui;
 
     GitLogView *logView;
+
 };
 
 #endif // LOGWINDOW_H
