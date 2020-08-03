@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         logwindow.cpp \
     gitlogmodel.cpp \
+    QGitLogDelegate.cpp \
     gitcommitfiles.cpp \
     gitdiffprocess.cpp
 
 HEADERS += \
         logwindow.h \
     gitlogmodel.h \
+    QGitLogDelegate.h \
     gitcommitfiles.h \
     gitdiffprocess.h
 
@@ -40,8 +42,11 @@ FORMS += \
         logwindow.ui
 
 
-INCLUDEPATH += $$PWD/../QGit
+INCLUDEPATH += $$PWD/../QGit/ $$PWD/../QGit/src/
 
 LIBS += -L$$OUT_PWD/../QGit/ -lQGit
 
 LIBS += -lgit2
+
+target.path = /usr/local/bin
+INSTALLS += target

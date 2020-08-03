@@ -90,11 +90,42 @@ namespace LibQGit2
             bool isSymbolic() const;
 
             /**
+             * Return true when the reference lives in the refs/heads namespace
+             */
+            bool isBranch() const;
+
+            /**
+             * Return true when the reference lives in the refs/notes namespace
+             */
+            bool isNote() const;
+
+            /**
+             * Return true when the reference lives in the refs/remotes namespace
+             */
+            bool isRemote() const;
+
+            /**
+             * Return true when the reference lives in the refs/tags namespace
+             */
+            bool isTag() const;
+
+            /**
+             * Return true if HEAD points at the branch
+             */
+            bool isHead() const;
+
+            /**
              * Get the full name of a reference
              *
              * @return the full name for the ref
              */
             QString name() const;
+
+            /**
+             * This will transform the reference name into a name "human-readable" version.
+             * If no shortname is appropriate, it will return the full name.
+             */
+            QString shortName() const;
 
             /**
              * Resolve a symbolic reference

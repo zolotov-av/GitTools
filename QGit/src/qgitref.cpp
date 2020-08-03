@@ -62,9 +62,39 @@ bool Reference::isSymbolic() const
     return git_reference_type(d.data()) == GIT_REF_SYMBOLIC;
 }
 
+bool Reference::isBranch() const
+{
+    return git_reference_is_branch(d.data()) != 0;
+}
+
+bool Reference::isNote() const
+{
+    return git_reference_is_note(d.data()) != 0;
+}
+
+bool Reference::isRemote() const
+{
+    return git_reference_is_remote(d.data()) != 0;
+}
+
+bool Reference::isTag() const
+{
+    return git_reference_is_tag(d.data()) != 0;
+}
+
+bool Reference::isHead() const
+{
+    return git_reference_is_branch(d.data()) != 0 && git_branch_is_head(d.data()) != 0;
+}
+
 QString Reference::name() const
 {
     return QString::fromUtf8(git_reference_name(d.data()));
+}
+
+QString Reference::shortName() const
+{
+    return QString::fromUtf8(git_reference_shorthand(d.data()));
 }
 
 Reference Reference::resolve() const

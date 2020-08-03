@@ -48,12 +48,12 @@ QModelIndex GitCommitFiles::index(int row, int column, const QModelIndex &parent
     return QModelIndex();
 }
 
-QModelIndex GitCommitFiles::parent(const QModelIndex &child) const
+QModelIndex GitCommitFiles::parent(const QModelIndex &) const
 {
     return QModelIndex();
 }
 
-QVariant GitCommitFiles::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant GitCommitFiles::headerData(int section, Qt::Orientation, int role) const
 {
     if ( role == Qt::DisplayRole )
     {

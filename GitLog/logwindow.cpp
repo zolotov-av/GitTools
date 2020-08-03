@@ -3,6 +3,7 @@
 
 #include "gitlogmodel.h"
 #include "gitcommitfiles.h"
+#include "QGitLogDelegate.h"
 
 #include <QDebug>
 #include <QDir>
@@ -20,12 +21,17 @@ LogWindow::LogWindow(QWidget *parent) :
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
 
+    QGitLogDelegate* gld = new QGitLogDelegate(this);
+    //gld->setLaneHeight(fontMetrics().height());
+    ui->logView->setItemDelegate(gld);
+
     logModel = new GitLogModel(this);
     logModel->setRepository(repo);
     ui->logView->setModel(logModel);
 
     filesModel = new GitCommitFiles(this);
     ui->commitView->setModel(filesModel);
+    ui->commitView->installEventFilter(this);
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
@@ -98,7 +104,8 @@ void LogWindow::openRepository(const QString &path)
     if ( repo->open(path) )
     {
         cache->setValue("repo/path", path);
-        logModel->open(repo->head());
+        //logModel->open(repo->head());
+        logModel->openAllRefs();
     }
 }
 
@@ -121,17 +128,17 @@ void LogWindow::fileClicked(const QModelIndex &index)
     filesModel->execute(index);
 }
 
-void LogWindow::splitterMoved(int pos, int index)
+void LogWindow::splitterMoved(int, int)
 {
     cache->setValue("window/splitter", ui->splitter->saveState());
 }
 
-void LogWindow::logViewColumnResized(int index, int oldSize, int newSize)
+void LogWindow::logViewColumnResized(int index, int, int newSize)
 {
     cache->setValue(QString("LogView/size%1").arg(index), newSize);
 }
 
-void LogWindow::commitViewColumnResized(int index, int oldSize, int newSize)
+void LogWindow::commitViewColumnResized(int index, int, int newSize)
 {
     cache->setValue(QString("CommitView/size%1").arg(index), newSize);
 }
@@ -139,7 +146,30 @@ void LogWindow::commitViewColumnResized(int index, int oldSize, int newSize)
 void LogWindow::onActivate(const QModelIndex &index)
 {
     qDebug() << "activated " << index.row();
+    ui->logView->clearSelection();
     ui->commitView->setFocus();
+    //ui->commitView->setCurrentIndex(filesModel->index(0, 0));
+    ui->commitView->setCurrentIndex(filesModel->index(0, 0));
+}
+
+bool LogWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if ( event->type() == QEvent::KeyPress )
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if ( keyEvent->key() == Qt::Key_Backspace )
+        {
+            if ( obj == ui->commitView )
+            {
+                ui->logView->setFocus();
+                ui->logView->setCurrentIndex(ui->logView->currentIndex());
+                ui->commitView->clearSelection();
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void LogWindow::resizeEvent(QResizeEvent *event)
