@@ -6,8 +6,6 @@
 
 #include "gitdiffprocess.h"
 
-using namespace LibQGit2;
-
 GitCommitFiles::GitCommitFiles(QObject *parent): QAbstractItemModel(parent), active(false), commit(), diff()
 {
 
@@ -25,7 +23,7 @@ int GitCommitFiles::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return active ? diff.numDeltas() : 0;
+    return active ? diff.deltaCount() : 0;
 }
 
 int GitCommitFiles::columnCount(const QModelIndex &parent) const
@@ -76,53 +74,49 @@ QVariant GitCommitFiles::headerData(int section, Qt::Orientation, int role) cons
 
 QVariant GitCommitFiles::GetDiffStatus(int index) const
 {
-    DiffDelta delta = diff.delta(index);
+    auto delta = diff.get_delta(index);
     switch ( delta.type() )
     {
-    case DiffDelta::Unknown:
-        return "unknown";
-    case DiffDelta::Unmodified:
+    case GIT_DELTA_UNMODIFIED:
         return "unmodified";
-    case DiffDelta::Added:
+    case GIT_DELTA_ADDED:
         return "new";
-    case DiffDelta::Deleted:
+    case GIT_DELTA_DELETED:
         return "deleted";
-    case DiffDelta::Modified:
-    case DiffDelta::Renamed:
-    case DiffDelta::Copied:
+    case GIT_DELTA_MODIFIED:
+    case GIT_DELTA_RENAMED:
+    case GIT_DELTA_COPIED:
         return "modified";
-    case DiffDelta::Ignored:
+    case GIT_DELTA_IGNORED:
         return "ignored";
-    case DiffDelta::Untracked:
+    case GIT_DELTA_UNTRACKED:
         return "untracked";
-    case DiffDelta::Typechange:
+    case GIT_DELTA_TYPECHANGE:
         return "typechange";
+    default:
+        return "unknown";
     }
-
-    return "";
 }
 
 QString GitCommitFiles::GetDiffPath(int index) const
 {
-    DiffDelta delta = diff.delta(index);
+    auto delta = diff.get_delta(index);
     switch ( delta.type() )
     {
-    case DiffDelta::Unknown:
-    case DiffDelta::Ignored:
-    case DiffDelta::Untracked:
-    case DiffDelta::Typechange:
-        return "N/A";
-    case DiffDelta::Unmodified:
-    case DiffDelta::Deleted:
-    case DiffDelta::Modified:
-    case DiffDelta::Renamed:
+    case GIT_DELTA_IGNORED:
+    case GIT_DELTA_UNTRACKED:
+    case GIT_DELTA_TYPECHANGE:
+    default:
+        return QStringLiteral("N/A");
+    case GIT_DELTA_UNMODIFIED:
+    case GIT_DELTA_DELETED:
+    case GIT_DELTA_MODIFIED:
+    case GIT_DELTA_RENAMED:
         return delta.oldFile().path();
-    case DiffDelta::Added:
-    case DiffDelta::Copied:
+    case GIT_DELTA_ADDED:
+    case GIT_DELTA_COPIED:
         return delta.newFile().path();
     }
-
-    return "N/A";
 }
 
 QString GitCommitFiles::GetDiffExtension(int index) const
@@ -163,19 +157,19 @@ QVariant GitCommitFiles::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void GitCommitFiles::open(LibQGit2::Repository *repo, const Commit &commit)
+void GitCommitFiles::open(git::repository *repo, const git::object_id &commit_oid)
 {
     this->beginResetModel();
-    this->commit = commit;
+    this->commit = repo->get_commit(commit_oid);
     if ( commit.parentCount() > 0 )
     {
-        this->diff = repo->diffTrees(commit.parent(0).tree(), commit.tree());
+        this->diff = repo->diff(repo->get_commit(commit.parentId(0)), commit);
         this->repo = repo;
         active = true;
     }
     else
     {
-        this->diff = Diff();
+        this->diff = {};
         active = false;
     }
     this->endResetModel();
@@ -195,18 +189,18 @@ void GitCommitFiles::execute(const QModelIndex &index)
         return;
     }
 
-    DiffDelta delta = diff.delta(index.row());
+    auto delta = diff.get_delta(index.row());
     switch ( delta.type() )
     {
-    case DiffDelta::Added:
+    case GIT_DELTA_ADDED:
         // TODO;
         return;
-    case DiffDelta::Deleted:
+    case GIT_DELTA_DELETED:
         // TODO
         return;
-    case DiffDelta::Modified:
-    case DiffDelta::Renamed:
-    case DiffDelta::Copied:
+    case GIT_DELTA_MODIFIED:
+    case GIT_DELTA_RENAMED:
+    case GIT_DELTA_COPIED:
         showDelta(delta);
     default:
         // do nothing
@@ -214,30 +208,17 @@ void GitCommitFiles::execute(const QModelIndex &index)
     }
 }
 
-void GitCommitFiles::showDelta(DiffDelta delta)
+void GitCommitFiles::showDelta(const git::delta &delta)
 {
     qDebug() << "parent count: " << commit.parentCount();
     qDebug() << "old file: " << delta.oldFile().path();
     qDebug() << "new file: " << delta.newFile().path();
-    TreeEntry te = commit.parent(0).tree().entryByPath(delta.oldFile().path());
-    qDebug() << "te = " << te.name();
-    git_blob *blob = NULL;
-    int error = git_blob_lookup(&blob, repo->data(), te.oid().data());
-    qDebug() << "git_blob_lookup() = " << error;
-    if ( error != 0 )
-    {
-        return;
-    }
-    Blob oldBlob(blob);
+    const auto oldEntry = git::tree(repo->get_commit(commit.parentId(0))).entryByPath(delta.oldFile().path());
+    qDebug() << "te = " << oldEntry.name();
+    git::blob oldBlob = repo->get_blob(oldEntry.id());
 
-    te = commit.tree().entryByPath(delta.oldFile().path());
-    error = git_blob_lookup(&blob, repo->data(), te.oid().data());
-    qDebug() << "git_blob_lookup() = " << error;
-    if ( error != 0 )
-    {
-        return;
-    }
-    Blob newBlob(blob);
+    const auto newEntry = git::tree(commit).entryByPath(delta.oldFile().path());
+    git::blob newBlob = repo->get_blob(newEntry.id());
 
     GitDiffProcess *process = new GitDiffProcess(this);
     process->open(oldBlob, newBlob);

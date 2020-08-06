@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-SUBDIRS+=QGit
+SUBDIRS+=libgt
 SUBDIRS+=GitLog
 
-GitLog.depends = QGit
+GitLog.depends = libgt

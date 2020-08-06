@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <QVector>
-#include <qgit2e.h>
+#include <GitTools/base.h>
 
 class GitCommitFiles : public QAbstractItemModel
 {
@@ -19,7 +19,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    void open(LibQGit2::Repository *repo, const LibQGit2::Commit &commit);
+    void open(git::repository *repo, const git::object_id &commit_oid);
     void close();
 
     void execute(const QModelIndex &index);
@@ -27,15 +27,15 @@ public:
 protected:
 
     bool active;
-    LibQGit2::Repository *repo;
-    LibQGit2::Commit commit;
-    LibQGit2::Diff diff;
+    git::repository *repo;
+    git::commit commit;
+    git::diff diff;
 
     QVariant GetDiffStatus(int index) const;
     QString GetDiffPath(int index) const;
     QString GetDiffExtension(int index) const;
 
-    void showDelta(LibQGit2::DiffDelta delta);
+    void showDelta(const git::delta &delta);
 };
 
 #endif // GITCOMMITFILES_H

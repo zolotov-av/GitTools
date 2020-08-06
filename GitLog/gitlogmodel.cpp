@@ -2,10 +2,6 @@
 
 #include <QDebug>
 
-#include <git2/refs.h>
-
-using namespace LibQGit2;
-
 GitLogModel::GitLogModel(QObject *parent): QAbstractItemModel(parent)
 {
 }
@@ -14,7 +10,7 @@ GitLogModel::~GitLogModel()
 {
 }
 
-void GitLogModel::setRepository(Repository *repo)
+void GitLogModel::setRepository(git::repository *repo)
 {
     this->repo = repo;
 }
@@ -91,9 +87,9 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
         case 1:
             return history[index.row()].shortMessage();
         case 2:
-            return history[index.row()].dateTime();
+            return history[index.row()].commit_time();
         case 3:
-            return history[index.row()].author().name();
+            return history[index.row()].author_name();
         default:
             return index.column() + 1;
         }
@@ -102,16 +98,17 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool GitLogModel::open(const Reference& reference)
+bool GitLogModel::open(const git::reference &reference)
 {
     beginResetModel();
-    Commit commit;
-    RevWalk revwalk(*repo);
-    revwalk.push(reference);
+    git::revwalk revwalk = repo->new_revwalk();
+    revwalk.push(reference.name());
     history.clear();
-    while ( revwalk.next(commit) )
+    git_oid commit_id;
+    while ( revwalk.next(commit_id) )
     {
-        GitCommitInfo info { commit };
+        const git::commit c = repo->get_commit(&commit_id);
+        GitCommitInfo info { c };
         if ( history.size() > 0 )
         {
             info.up = history[history.size()-1].childOf(info);
@@ -136,22 +133,26 @@ bool GitLogModel::openAllRefs()
 
     updateRefs();
 
-    RevWalk revwalk(*repo);
-    revwalk.setSorting(RevWalk::Topological);
-    revwalk.push(repo->head());
-    for(auto ref : refs)
+    git::revwalk revwalk = repo->new_revwalk();
+    revwalk.setSorting(GIT_SORT_TOPOLOGICAL);
+    revwalk.push("HEAD");
+    for(const auto &ref : refs)
     {
-        try {
-            revwalk.push(ref);
-        } catch (const LibQGit2::Exception &e) {
+        try
+        {
+            revwalk.push(ref.name);
+        }
+        catch (const git::exception &e)
+        {
             qDebug() << "revwalk.push() exception: " << e.what();
         }
     }
 
     history.clear();
-    Commit commit;
-    while ( revwalk.next(commit) )
+    git_oid commit_id;
+    while ( revwalk.next(commit_id) )
     {
+        auto commit = repo->get_commit(&commit_id);
         history.append(commit);
     }
 
@@ -186,7 +187,7 @@ void GitLogModel::updateRefs()
             {
                 break;
             }
-            refs.append(Reference(ref));
+            refs.append(git::reference(ref));
         }
 
         git_reference_iterator_free(iter);
@@ -244,17 +245,17 @@ void GitLogModel::updateGraph()
                     if ( commit.parentCount() > 0 )
                     {
                         commit.down = true;
-                        lanes[li] = {GraphLane::line, commit.parent(0).oid()};
+                        lanes[li] = {GraphLane::line, commit.parentId(0)};
                     }
                     else
                     {
                         commit.down = false;
-                        lanes[li] = {GraphLane::end, LibQGit2::OId{}};
+                        lanes[li] = {GraphLane::end, git::object_id{}};
                     }
                 }
                 else
                 {
-                    lanes[li] = {GraphLane::end, LibQGit2::OId{}};
+                    lanes[li] = {GraphLane::end, git::object_id{}};
                     //qDebug() << "found again: " << commit.message();
                 }
             }
@@ -275,13 +276,13 @@ void GitLogModel::updateGraph()
             commit.lane = lanes.indexOf(lane);
             commit.down = true;
             lane.type = GraphLane::start;
-            lane.parent = commit.parent(0).oid();
+            lane.parent = commit.parentId(0);
             int parentCount = commit.parentCount();
             for(int p = 1; p < parentCount; p++)
             {
                 auto &lane = getFreeLane(lanes);
                 lane.type = GraphLane::start;
-                lane.parent = commit.parent(p).oid();
+                lane.parent = commit.parentId(p);
             }
             commit.lanes = lanes;
             continue;
@@ -293,14 +294,14 @@ void GitLogModel::updateGraph()
             // allocate free lane
             GraphLane &lane = getFreeLane(lanes, commit.lane);
             lane.type = GraphLane::start;
-            lane.parent = commit.parent(p).oid();
+            lane.parent = commit.parentId(p);
         }
 
         commit.lanes = lanes;
     }
 }
 
-GitCommitInfo GitLogModel::getCommit(const QModelIndex &index) const
+GitCommitInfo GitLogModel::getCommitInfo(const QModelIndex &index) const
 {
     if ( index.isValid() )
     {

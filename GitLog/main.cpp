@@ -1,10 +1,10 @@
 #include "logwindow.h"
-#include <qgit2e.h>
 #include <QApplication>
+#include <git2.h>
 
 int main(int argc, char *argv[])
 {
-    LibQGit2::initLibQGit2();
+    git_libgit2_init();
 
     QApplication a(argc, argv);
     LogWindow w;
@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     int exitCode = a.exec();
 
-    LibQGit2::shutdownLibQGit2();
+    git_libgit2_shutdown();
 
     return exitCode;
 }

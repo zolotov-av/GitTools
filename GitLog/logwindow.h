@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QSettings>
-#include <qgit2e.h>
+#include <GitTools/base.h>
 
 namespace Ui {
 class LogWindow;
@@ -50,7 +50,7 @@ private:
     GitCommitFiles *filesModel;
     GitLogView *logView;
 
-    LibQGit2::Repository *repo = new LibQGit2::Repository();
+    git::repository repo;
 
 };
 

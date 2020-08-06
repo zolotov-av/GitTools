@@ -2,7 +2,7 @@
 #define QGITLOGDELEGATE_H
 
 #include <QStyledItemDelegate>
-#include <qgit2e.h>
+#include <GitTools/base.h>
 
 class QGitLogDelegate: public QStyledItemDelegate
 {
@@ -27,7 +27,7 @@ public slots:
 private:
     //const Rev* revLookup(int row, FileHistory** fhPtr = NULL) const;
     void paintGraph(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& i) const;
-    void paintRef(QPainter *p, QStyleOptionViewItem &opt, const LibQGit2::Reference &ref) const;
+    void paintRef(QPainter *p, QStyleOptionViewItem &opt, const git::reference_info &ref) const;
     void paintLog(QPainter *p, const QStyleOptionViewItem& o, const QModelIndex &i) const;
     //void paintGraph(QPainter* p, const QStyleOptionViewItem& o, const QModelIndex &i) const;
     //void paintGraphLane(QPainter* p, int type, int x1, int x2, const QColor& col, const QColor& activeCol, const QBrush& back) const;

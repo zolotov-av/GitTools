@@ -10,8 +10,6 @@
 #include <QFileDialog>
 #include <QResizeEvent>
 
-using namespace LibQGit2;
-
 LogWindow::LogWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::LogWindow)
@@ -26,7 +24,7 @@ LogWindow::LogWindow(QWidget *parent) :
     ui->logView->setItemDelegate(gld);
 
     logModel = new GitLogModel(this);
-    logModel->setRepository(repo);
+    logModel->setRepository(&repo);
     ui->logView->setModel(logModel);
 
     filesModel = new GitCommitFiles(this);
@@ -88,7 +86,6 @@ LogWindow::LogWindow(QWidget *parent) :
 LogWindow::~LogWindow()
 {
     delete ui;
-    delete repo;
 }
 
 void LogWindow::openRepository()
@@ -101,12 +98,10 @@ void LogWindow::openRepository()
 
 void LogWindow::openRepository(const QString &path)
 {
-    if ( repo->open(path) )
-    {
-        cache->setValue("repo/path", path);
-        //logModel->open(repo->head());
-        logModel->openAllRefs();
-    }
+    repo.open(path);
+    cache->setValue("repo/path", path);
+    //logModel->open(repo->head());
+    logModel->openAllRefs();
 }
 
 void LogWindow::commitSelected(const QModelIndex &index)
@@ -116,11 +111,11 @@ void LogWindow::commitSelected(const QModelIndex &index)
         return;
     }
 
-    Commit commit = logModel->getCommit(index);
+    auto commit = logModel->getCommitInfo(index);
 
-    QString message = QString("SHA-1: %1\n\n%2").arg(QString(commit.oid().format())).arg(commit.message());
+    QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
     ui->commitMessage->setText(message);
-    filesModel->open(repo, commit);
+    filesModel->open(&repo, commit.oid());
 }
 
 void LogWindow::fileClicked(const QModelIndex &index)

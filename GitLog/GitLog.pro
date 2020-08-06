@@ -42,9 +42,7 @@ FORMS += \
         logwindow.ui
 
 
-INCLUDEPATH += $$PWD/../QGit/ $$PWD/../QGit/src/
-
-LIBS += -L$$OUT_PWD/../QGit/ -lQGit
+INCLUDEPATH += $$PWD/../libgt/
 
 LIBS += -lgit2
 

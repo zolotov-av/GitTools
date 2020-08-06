@@ -6,8 +6,6 @@
 
 #include "gitlogmodel.h"
 
-using namespace LibQGit2;
-
 constexpr int GRAPH_COL = 0;
 constexpr int LOG_COL = 1;
 
@@ -47,7 +45,6 @@ static inline int get_row_height(const QFontMetrics &fm)
 
 void QGitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
 {
-
     if (opt.state & QStyle::State_Selected)
         p->fillRect(opt.rect, opt.palette.highlight());
     else if (index.row() & 1)
@@ -56,7 +53,8 @@ void QGitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, c
         p->fillRect(opt.rect, opt.palette.base());
 
     const GitLogModel *model = static_cast<const GitLogModel*>(index.model());
-    GitCommitInfo commit = model->getCommit(index);
+
+    GitCommitInfo commit = model->getCommitInfo(index);
 
     QFontMetrics fm(opt.font);
     //qDebug() << "fm.height=" << fm.height() << "box.height=" << box.height();
@@ -138,10 +136,10 @@ void QGitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, c
     p->restore();
 }
 
-void QGitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const Reference &ref) const
+void QGitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git::reference_info &ref) const
 {
     QFontMetrics fm(opt.font);
-    QString name = ref.shortName();
+    const QString name = ref.short_name;
     QRect box = fm.boundingRect(name);
     //qDebug() << "fm.height=" << fm.height() << "box.height=" << box.height();
 
@@ -156,8 +154,8 @@ void QGitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const Ref
 
     QRect pbox(opt.rect.left() + border, opt.rect.top() + border, box.width() + 2*spacing + border, fm.height() + 3*border);
 
-    if ( ref.isHead() ) p->setBrush(GT_Red);
-    else if ( ref.isBranch() ) p->setBrush(GT_Green);
+    if ( ref.isHead ) p->setBrush(GT_Red);
+    else if ( ref.isBranch ) p->setBrush(GT_Green);
     else p->setBrush(GT_Orange);
     p->setRenderHints(QPainter::Antialiasing, false);
     //p->drawRoundedRect(pbox, 2*spacing, 2*spacing, Qt::AbsoluteSize);
@@ -173,7 +171,7 @@ void QGitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const Ref
 void QGitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const
 {
     const GitLogModel *model = static_cast<const GitLogModel*>(index.model());
-    Commit commit = model->getCommit(index);
+    auto commit = model->getCommitInfo(index);
 
     QStyleOptionViewItem opt(o); // we need a copy
 
@@ -182,9 +180,9 @@ void QGitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const
         p->fillRect(opt.rect, opt.palette.highlight());
     }
 
-    for(Reference ref : model->refs)
+    for(const auto &ref : model->refs)
     {
-        if ( (ref.isBranch() || ref.isRemote()) && ref.resolve().target() == commit.oid() )
+        if ( (ref.isBranch || ref.isRemote) && (ref.target == commit.oid()) )
         {
             paintRef(p, opt, ref);
         }

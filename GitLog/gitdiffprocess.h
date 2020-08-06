@@ -1,7 +1,8 @@
 #ifndef GITDIFFPROCESS_H
 #define GITDIFFPROCESS_H
 
-#include <qgit2e.h>
+#include <QObject>
+#include <GitTools/base.h>
 
 class GitDiffProcess : public QObject
 {
@@ -10,7 +11,7 @@ public:
     explicit GitDiffProcess(QObject *parent = nullptr);
     ~GitDiffProcess();
 
-    bool open(LibQGit2::Blob a, LibQGit2::Blob b);
+    bool open(const git::blob &a, const git::blob &b);
 
 signals:
 

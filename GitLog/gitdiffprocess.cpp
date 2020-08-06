@@ -5,8 +5,6 @@
 #include <QTemporaryFile>
 #include <QDebug>
 
-using namespace LibQGit2;
-
 GitDiffProcess::GitDiffProcess(QObject *parent) : QObject(parent)
 {
 
@@ -17,7 +15,7 @@ GitDiffProcess::~GitDiffProcess()
     qDebug() << "GitDiffProcess destroy";
 }
 
-bool GitDiffProcess::open(LibQGit2::Blob a, LibQGit2::Blob b)
+bool GitDiffProcess::open(const git::blob &a, const git::blob &b)
 {
     aFile = new QTemporaryFile(this);
     bFile = new QTemporaryFile(this);
@@ -28,10 +26,10 @@ bool GitDiffProcess::open(LibQGit2::Blob a, LibQGit2::Blob b)
     QString oldPath = aFile->fileName();
     QString newPath = bFile->fileName();
 
-    aFile->write(a.content());
+    aFile->write(a.rawcontent());
     aFile->flush();
 
-    bFile->write(b.content());
+    bFile->write(b.rawcontent());
     bFile->flush();
 
     QString command = QString("/usr/bin/meld %1 %2").arg(oldPath).arg(newPath);
