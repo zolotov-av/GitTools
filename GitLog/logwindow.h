@@ -37,6 +37,8 @@ private slots:
 
     void onActivate(const QModelIndex &index);
 
+    void on_actionCreateBranch_triggered();
+
 protected:
 
     bool eventFilter(QObject *obj, QEvent *ev) override;

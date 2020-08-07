@@ -143,6 +143,11 @@ namespace git
             return git_reference_is_remote(r);
         }
 
+        bool isTag() const
+        {
+            return git_reference_is_tag(r);
+        }
+
         object_id target() const
         {
             return git_reference_target(r);
@@ -315,7 +320,7 @@ namespace git
             return git_commit_parent_id(c, n);
         }
 
-        git_commit* data() const
+        const git_commit* data() const
         {
             return c;
         }
@@ -617,6 +622,27 @@ namespace git
             r = nullptr;
         }
 
+        reference get_head() const
+        {
+            git_reference *ref;
+            check( git_repository_head(&ref, r) );
+            return ref;
+        }
+
+        reference get_branch(const string &name, git_branch_t type = GIT_BRANCH_LOCAL) const
+        {
+            git_reference *ref;
+            check( git_branch_lookup(&ref, r, std_string(name).c_str(), type) );
+            return ref;
+        }
+
+        reference get_reference(const string &name)
+        {
+            git_reference *ref;
+            check( git_reference_lookup(&ref, r, std_string(name).c_str()) );
+            return ref;
+        }
+
         blob get_blob(const git_oid *id) const
         {
             git_blob *b;
@@ -653,6 +679,13 @@ namespace git
             git_revwalk *rw;
             check( git_revwalk_new(&rw, r) );
             return rw;
+        }
+
+        reference create_branch(const string &name, const git::commit &target, bool force = false)
+        {
+            git_reference *ref;
+            check( git_branch_create(&ref, r, std_string(name).c_str(), target.data(), force) );
+            return ref;
         }
 
         git_repository* data() const

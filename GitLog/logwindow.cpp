@@ -4,6 +4,7 @@
 #include "gitlogmodel.h"
 #include "gitcommitfiles.h"
 #include "QGitLogDelegate.h"
+#include "CreateBranchDialog.h"
 
 #include <QDebug>
 #include <QDir>
@@ -22,6 +23,7 @@ LogWindow::LogWindow(QWidget *parent) :
     QGitLogDelegate* gld = new QGitLogDelegate(this);
     //gld->setLaneHeight(fontMetrics().height());
     ui->logView->setItemDelegate(gld);
+    ui->logView->addAction(ui->actionCreateBranch);
 
     logModel = new GitLogModel(this);
     logModel->setRepository(&repo);
@@ -145,6 +147,19 @@ void LogWindow::onActivate(const QModelIndex &index)
     ui->commitView->setFocus();
     //ui->commitView->setCurrentIndex(filesModel->index(0, 0));
     ui->commitView->setCurrentIndex(filesModel->index(0, 0));
+}
+
+void LogWindow::on_actionCreateBranch_triggered()
+{
+    qDebug() << "on_actionCreateBranch_triggered()";
+    auto commit = logModel->getCommitInfo(ui->logView->currentIndex());
+
+    auto dlg = new CreateBranchDialog(this);
+    dlg->setModel(logModel);
+    dlg->setRepositiory(&repo);
+    dlg->setCommitId(commit.oid().toString());
+    dlg->show();
+
 }
 
 bool LogWindow::eventFilter(QObject *obj, QEvent *event)

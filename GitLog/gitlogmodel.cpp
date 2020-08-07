@@ -163,6 +163,12 @@ bool GitLogModel::openAllRefs()
     return true;
 }
 
+void GitLogModel::update()
+{
+    // TODO
+    openAllRefs();
+}
+
 void GitLogModel::clear()
 {
     beginResetModel();

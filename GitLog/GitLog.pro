@@ -24,6 +24,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    CreateBranchDialog.cpp \
         main.cpp \
         logwindow.cpp \
     gitlogmodel.cpp \
@@ -32,6 +33,8 @@ SOURCES += \
     gitdiffprocess.cpp
 
 HEADERS += \
+    CreateBranchDialog.h \
+    GitCommitInfo.h \
         logwindow.h \
     gitlogmodel.h \
     QGitLogDelegate.h \
@@ -39,6 +42,7 @@ HEADERS += \
     gitdiffprocess.h
 
 FORMS += \
+        CreateBranchDialog.ui \
         logwindow.ui
 
 
