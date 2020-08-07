@@ -1,5 +1,5 @@
 # GitTools
 
-Graphical git tools TortoiseGit
+Graphical git tools, I want make something like TortoiseGit for Linux
 
 Work in progress
