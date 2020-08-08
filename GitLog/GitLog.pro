@@ -36,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
     CreateBranchDialog.h \
+    DeleteBranchDialog.h \
     ExceptionTooltip.h \
     GitCommitInfo.h \
         logwindow.h \
@@ -46,6 +47,7 @@ HEADERS += \
 
 FORMS += \
         CreateBranchDialog.ui \
+        DeleteBranchDialog.ui \
         ExceptionTooltip.ui \
         logwindow.ui
 

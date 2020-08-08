@@ -109,13 +109,13 @@ namespace git
 
         ~reference()
         {
-            if ( r ) git_reference_free(r);
+            free();
         }
 
         reference& operator = (const reference &) = delete;
         reference& operator = (reference &&other)
         {
-            if ( r ) git_reference_free(r);
+            free();
             r = other.r;
             other.r = nullptr;
             return *this;
@@ -161,6 +161,27 @@ namespace git
         string shortName() const
         {
             return anystr(git_reference_shorthand(r));
+        }
+
+        void delete_reference()
+        {
+            check( git_reference_delete(r) );
+            free();
+        }
+
+        void delete_branch()
+        {
+            check( git_branch_delete(r) );
+            free();
+        }
+
+        void free()
+        {
+            if ( r )
+            {
+                git_reference_free(r);
+                r = nullptr;
+            }
         }
 
     };
@@ -686,6 +707,21 @@ namespace git
             git_reference *ref;
             check( git_branch_create(&ref, r, std_string(name).c_str(), target.data(), force) );
             return ref;
+        }
+
+        void delete_branch(const string &name)
+        {
+            delete_branch( get_branch(name) );
+        }
+
+        void delete_branch(reference &&ref)
+        {
+            ref.delete_branch();
+        }
+
+        void delete_refence(reference &&ref)
+        {
+            ref.delete_reference();
         }
 
         git_repository* data() const

@@ -5,6 +5,7 @@
 #include "gitcommitfiles.h"
 #include "QGitLogDelegate.h"
 #include "CreateBranchDialog.h"
+#include "DeleteBranchDialog.h"
 
 #include <QDebug>
 #include <QDir>
@@ -24,6 +25,7 @@ LogWindow::LogWindow(QWidget *parent) :
     //gld->setLaneHeight(fontMetrics().height());
     ui->logView->setItemDelegate(gld);
     ui->logView->addAction(ui->actionCreateBranch);
+    ui->logView->addAction(ui->actionDeleteBranch);
 
     logModel = new GitLogModel(this);
     logModel->setRepository(&repo);
@@ -158,6 +160,18 @@ void LogWindow::on_actionCreateBranch_triggered()
     dlg->setModel(logModel);
     dlg->setRepositiory(&repo);
     dlg->setCommitId(commit.oid().toString());
+    dlg->show();
+
+}
+
+void LogWindow::on_actionDeleteBranch_triggered()
+{
+    qDebug() << "on_actionDeleteBranch_triggered()";
+    auto commit = logModel->getCommitInfo(ui->logView->currentIndex());
+
+    auto dlg = new git::DeleteBranchDialog(this);
+    dlg->setModel(logModel);
+    dlg->setCommitId(&repo, commit.oid().toString());
     dlg->show();
 
 }

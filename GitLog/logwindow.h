@@ -38,6 +38,7 @@ private slots:
     void onActivate(const QModelIndex &index);
 
     void on_actionCreateBranch_triggered();
+    void on_actionDeleteBranch_triggered();
 
 protected:
 

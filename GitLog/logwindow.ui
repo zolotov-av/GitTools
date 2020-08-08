@@ -73,6 +73,11 @@
     <string>Create Branch</string>
    </property>
   </action>
+  <action name="actionDeleteBranch">
+   <property name="text">
+    <string>DeleteBranch</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
