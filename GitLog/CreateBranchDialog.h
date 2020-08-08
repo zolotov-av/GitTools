@@ -5,11 +5,14 @@
 #include <QDebug>
 #include <QCloseEvent>
 #include <QHideEvent>
+#include <QToolTip>
+#include <QTimer>
 #include "GitCommitInfo.h"
 #include "ui_CreateBranchDialog.h"
 #include <GitTools/base.h>
 #include <QMessageBox>
 #include "gitlogmodel.h"
+#include "ExceptionTooltip.h"
 
 class CreateBranchDialog : public QDialog, Ui::CreateBranchDialog
 {
@@ -67,13 +70,20 @@ protected slots:
     {
         qDebug() << "CreateBranchDialog::on_accepted";
 
+
+    }
+
+    void on_pbOk_clicked()
+    {
+        qDebug() << "on_pbOk_clicked()";
+
         try
         {
             const QString name = leBranch->text();
             qDebug() << QString("create branch: %1").arg(name);
             if ( name.isEmpty() )
             {
-                QMessageBox::warning(this, "Error", "branch name is empty");
+                ExceptionTooltip::showBelow(leBranch, "Error", "branch name is empty");
                 return;
             }
 
@@ -87,15 +97,16 @@ protected slots:
 
             if ( cbSwitchToNew->checkState() )
             {
-                QMessageBox::warning(this, "TODO", "switch not implemented yet");
+                ExceptionTooltip::showBelow(leBranch, "TODO", "switch not implemented yet");
             }
+
+            accept();
 
         }
         catch (const std::exception &e)
         {
-            QMessageBox::warning(this, "Error", git::qt_string(e.what()));
+            ExceptionTooltip::show(this, e);
         }
-
     }
 
 public:

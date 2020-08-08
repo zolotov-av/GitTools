@@ -172,22 +172,6 @@ QGroupBox::title {
  <resources/>
  <connections>
   <connection>
-   <sender>pbOk</sender>
-   <signal>clicked()</signal>
-   <receiver>CreateBranchDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>347</x>
-     <y>408</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>245</x>
-     <y>219</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pbCancel</sender>
    <signal>clicked()</signal>
    <receiver>CreateBranchDialog</receiver>

@@ -8,6 +8,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+CONFIG += c++17
+
 TARGET = GitLog
 TEMPLATE = app
 
@@ -34,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
     CreateBranchDialog.h \
+    ExceptionTooltip.h \
     GitCommitInfo.h \
         logwindow.h \
     gitlogmodel.h \
@@ -43,6 +46,7 @@ HEADERS += \
 
 FORMS += \
         CreateBranchDialog.ui \
+        ExceptionTooltip.ui \
         logwindow.ui
 
 

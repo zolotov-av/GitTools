@@ -44,6 +44,16 @@ namespace git
         return s; // QString::fromStdString(s);
     }
 
+    inline QString qt_string(const std::string &s)
+    {
+        return QString::fromStdString(s);
+    }
+
+    inline QString qt_string(const QString &s)
+    {
+        return s;
+    }
+
     inline int strpos(const std::string &str, const std::string &needle, int offset = 0)
     {
         auto pos = str.find(needle, offset);
