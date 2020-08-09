@@ -1,8 +1,6 @@
 TEMPLATE = subdirs
 
-CONFIG += ordered
-
-SUBDIRS+=libgt
+SUBDIRS+=gtcore
 SUBDIRS+=GitLog
 
-GitLog.depends = libgt
+GitLog.depends = gtcore
