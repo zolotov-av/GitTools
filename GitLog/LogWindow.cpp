@@ -1,9 +1,9 @@
-#include "logwindow.h"
-#include "ui_logwindow.h"
+#include "LogWindow.h"
+#include "ui_LogWindow.h"
 
-#include "gitlogmodel.h"
-#include "gitcommitfiles.h"
-#include "QGitLogDelegate.h"
+#include <GitTools/GitLogModel.h>
+#include <GitTools/GitCommitFiles.h>
+#include <GitTools/GitLogDelegate.h>
 #include "CreateBranchDialog.h"
 #include "DeleteBranchDialog.h"
 
@@ -21,7 +21,7 @@ LogWindow::LogWindow(QWidget *parent) :
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
 
-    QGitLogDelegate* gld = new QGitLogDelegate(this);
+    GitLogDelegate* gld = new GitLogDelegate(this);
     //gld->setLaneHeight(fontMetrics().height());
     ui->logView->setItemDelegate(gld);
     ui->logView->addAction(ui->actionCreateBranch);

@@ -1,4 +1,4 @@
-#include "logwindow.h"
+#include "LogWindow.h"
 #include <QApplication>
 #include <git2.h>
 

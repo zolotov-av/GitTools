@@ -1,4 +1,4 @@
-#include "gitlogmodel.h"
+#include "GitLogModel.h"
 
 #include <QDebug>
 

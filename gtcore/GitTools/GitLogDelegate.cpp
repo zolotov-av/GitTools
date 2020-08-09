@@ -1,10 +1,10 @@
-#include "QGitLogDelegate.h"
+#include "GitLogDelegate.h"
 
 #include <QPainter>
 #include <QColor>
 #include <QDebug>
 
-#include "gitlogmodel.h"
+#include <GitTools/GitLogModel.h>
 
 constexpr int GRAPH_COL = 0;
 constexpr int LOG_COL = 1;
@@ -23,7 +23,7 @@ const QColor GT_Red("#FF3500");
 const QColor GT_Orange("#FF8900");
 const QColor GT_Blue("#086FA1");
 
-QGitLogDelegate::QGitLogDelegate(QObject *parent): QStyledItemDelegate(parent)
+GitLogDelegate::GitLogDelegate(QObject *parent): QStyledItemDelegate(parent)
 {
     qDebug() << "QGitLogDelegate create";
 }
@@ -43,7 +43,7 @@ static inline int get_row_height(const QFontMetrics &fm)
     return get_border(fm)*6 + fm.height();
 }
 
-void QGitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
+void GitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
 {
     if (opt.state & QStyle::State_Selected)
         p->fillRect(opt.rect, opt.palette.highlight());
@@ -136,7 +136,7 @@ void QGitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, c
     p->restore();
 }
 
-void QGitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git::reference_info &ref) const
+void GitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git::reference_info &ref) const
 {
     QFontMetrics fm(opt.font);
     const QString name = ref.short_name;
@@ -168,7 +168,7 @@ void QGitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git
     opt.rect.adjust(pbox.width() + spacing, 0, 0, 0);
 }
 
-void QGitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const
+void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const
 {
     const GitLogModel *model = static_cast<const GitLogModel*>(index.model());
     auto commit = model->getCommitInfo(index);
@@ -236,7 +236,7 @@ void QGitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const
     //QStyledItemDelegate::paint(p, opt, index);
 }
 
-void QGitLogDelegate::paint(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
+void GitLogDelegate::paint(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
 {
     p->setRenderHints(QPainter::Antialiasing);
 
@@ -249,7 +249,7 @@ void QGitLogDelegate::paint(QPainter* p, const QStyleOptionViewItem& opt, const 
     return QStyledItemDelegate::paint(p, opt, index);
 }
 
-QSize QGitLogDelegate::sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &) const
+QSize GitLogDelegate::sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &) const
 {
     QFontMetrics fm(opt.font);
     return QSize( 15*fm.averageCharWidth(), get_row_height(fm) );

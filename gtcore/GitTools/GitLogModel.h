@@ -1,5 +1,5 @@
-#ifndef GITLOGMODEL_H
-#define GITLOGMODEL_H
+#ifndef GT_GITLOG_MODEL_H
+#define GT_GITLOG_MODEL_H
 
 #include <QAbstractItemModel>
 #include <GitTools/base.h>
@@ -7,7 +7,7 @@
 
 class GitLogModel : public QAbstractItemModel
 {
-friend class QGitLogDelegate;
+friend class GitLogDelegate;
 public:
 
     using GraphLane = git::GraphLane;
@@ -44,4 +44,4 @@ protected:
 
 };
 
-#endif // GITLOGMODEL_H
+#endif // GT_GITLOG_MODEL_H

@@ -10,7 +10,7 @@
 #include "ui_CreateBranchDialog.h"
 #include <GitTools/base.h>
 #include <QMessageBox>
-#include "gitlogmodel.h"
+#include <GitTools/GitLogModel.h>
 #include "ExceptionTooltip.h"
 
 class CreateBranchDialog : public QDialog, Ui::CreateBranchDialog

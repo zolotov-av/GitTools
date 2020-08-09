@@ -1,7 +1,9 @@
-#ifndef GITDIFFPROCESS_H
-#define GITDIFFPROCESS_H
+#ifndef GT_GITDIFF_PROCESS_H
+#define GT_GITDIFF_PROCESS_H
 
 #include <QObject>
+#include <QTimer>
+#include <QTemporaryFile>
 #include <GitTools/base.h>
 
 class GitDiffProcess : public QObject
@@ -24,4 +26,4 @@ private:
 
 };
 
-#endif // GITDIFFPROCESS_H
+#endif // GT_GITDIFF_PROCESS_H

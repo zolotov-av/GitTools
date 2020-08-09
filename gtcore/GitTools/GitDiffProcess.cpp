@@ -1,8 +1,6 @@
-#include "gitdiffprocess.h"
+#include "GitDiffProcess.h"
 
-#include <QTimer>
 #include <QProcess>
-#include <QTemporaryFile>
 #include <QDebug>
 
 GitDiffProcess::GitDiffProcess(QObject *parent) : QObject(parent)

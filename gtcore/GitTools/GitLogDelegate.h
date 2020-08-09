@@ -1,11 +1,11 @@
-#ifndef QGITLOGDELEGATE_H
-#define QGITLOGDELEGATE_H
+#ifndef GT_GITLOG_DELEGATE_H
+#define GT_GITLOG_DELEGATE_H
 
 #include <QStyledItemDelegate>
 #include <GitTools/base.h>
 #include <GitTools/CommitInfo.h>
 
-class QGitLogDelegate: public QStyledItemDelegate
+class GitLogDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 
@@ -13,7 +13,7 @@ public:
 
     using GraphLane = git::GraphLane;
 
-    QGitLogDelegate(QObject *parent = nullptr);
+    GitLogDelegate(QObject *parent = nullptr);
 
     //ListViewDelegate(Git* git, ListViewProxy* lp, QObject* parent);
 
@@ -46,4 +46,4 @@ private:
     //int diffTargetRow;
 };
 
-#endif // QGITLOGDELEGATE_H
+#endif // GT_GITLOG_DELEGATE_H

@@ -26,28 +26,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    main.cpp \
-    logwindow.cpp \
-    gitlogmodel.cpp \
-    QGitLogDelegate.cpp \
-    gitcommitfiles.cpp \
-    gitdiffprocess.cpp
+    LogWindow.cpp \
+    main.cpp
 
 HEADERS += \
     CreateBranchDialog.h \
     DeleteBranchDialog.h \
     ExceptionTooltip.h \
-    logwindow.h \
-    gitlogmodel.h \
-    QGitLogDelegate.h \
-    gitcommitfiles.h \
-    gitdiffprocess.h
+    LogWindow.h
 
 FORMS += \
     CreateBranchDialog.ui \
     DeleteBranchDialog.ui \
     ExceptionTooltip.ui \
-    logwindow.ui
+    LogWindow.ui
 
 
 INCLUDEPATH += $$PWD/../gtcore

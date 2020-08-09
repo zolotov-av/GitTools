@@ -1,10 +1,7 @@
-#include "gitcommitfiles.h"
+#include "GitCommitFiles.h"
 
-#include <QProcess>
-#include <QTemporaryFile>
 #include <QDebug>
-
-#include "gitdiffprocess.h"
+#include <GitTools/GitDiffProcess.h>
 
 GitCommitFiles::GitCommitFiles(QObject *parent): QAbstractItemModel(parent), active(false), commit(), diff()
 {

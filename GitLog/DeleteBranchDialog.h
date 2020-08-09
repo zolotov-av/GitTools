@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QDialog>
 #include <GitTools/base.h>
-#include "gitlogmodel.h"
+#include <GitTools/GitLogModel.h>
 #include "ui_DeleteBranchDialog.h"
 #include "ExceptionTooltip.h"
 
