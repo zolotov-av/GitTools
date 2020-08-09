@@ -3,12 +3,15 @@
 
 #include <QAbstractItemModel>
 #include <GitTools/base.h>
-#include "GitCommitInfo.h"
+#include <GitTools/CommitInfo.h>
 
 class GitLogModel : public QAbstractItemModel
 {
 friend class QGitLogDelegate;
 public:
+
+    using GraphLane = git::GraphLane;
+
     GitLogModel(QObject *parent);
     ~GitLogModel() override;
 
@@ -26,13 +29,13 @@ public:
     bool openAllRefs();
     void update();
 
-    GitCommitInfo getCommitInfo(const QModelIndex &index) const;
+    git::CommitInfo getCommitInfo(const QModelIndex &index) const;
 
 protected:
 
     git::repository *repo = nullptr;
 
-    QVector<GitCommitInfo> history;
+    QVector<git::CommitInfo> history;
     QList<git::reference_info> refs;
 
     void clear();

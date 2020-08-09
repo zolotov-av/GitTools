@@ -37,7 +37,6 @@ HEADERS += \
     CreateBranchDialog.h \
     DeleteBranchDialog.h \
     ExceptionTooltip.h \
-    GitCommitInfo.h \
     logwindow.h \
     gitlogmodel.h \
     QGitLogDelegate.h \

@@ -7,7 +7,6 @@
 #include <QHideEvent>
 #include <QToolTip>
 #include <QTimer>
-#include "GitCommitInfo.h"
 #include "ui_CreateBranchDialog.h"
 #include <GitTools/base.h>
 #include <QMessageBox>

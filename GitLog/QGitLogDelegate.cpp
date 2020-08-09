@@ -54,7 +54,7 @@ void QGitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, c
 
     const GitLogModel *model = static_cast<const GitLogModel*>(index.model());
 
-    GitCommitInfo commit = model->getCommitInfo(index);
+    git::CommitInfo commit = model->getCommitInfo(index);
 
     QFontMetrics fm(opt.font);
     //qDebug() << "fm.height=" << fm.height() << "box.height=" << box.height();

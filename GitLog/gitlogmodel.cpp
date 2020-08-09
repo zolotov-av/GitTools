@@ -108,7 +108,7 @@ bool GitLogModel::open(const git::reference &reference)
     while ( revwalk.next(commit_id) )
     {
         const git::commit c = repo->get_commit(&commit_id);
-        GitCommitInfo info { c };
+        git::CommitInfo info { c };
         if ( history.size() > 0 )
         {
             info.up = history[history.size()-1].childOf(info);
@@ -200,16 +200,16 @@ void GitLogModel::updateRefs()
     }
 }
 
-static GraphLane& getFreeLane(QVector<GraphLane> &lanes, int offset = 0)
+static git::GraphLane& getFreeLane(QVector<git::GraphLane> &lanes, int offset = 0)
 {
     int count = lanes.size();
     for(int i = offset; i < count; i++)
     {
         auto &lane = lanes[i];
-        if ( lane.type == GraphLane::free ) return lane;
+        if ( lane.type == git::GraphLane::free ) return lane;
     }
 
-    lanes.append(GraphLane());
+    lanes.append(git::GraphLane());
     return lanes[lanes.size()-1];
 }
 
@@ -231,11 +231,11 @@ void GitLogModel::updateGraph()
         }
     }
 
-    QVector<GraphLane> lanes;
+    QVector<git::GraphLane> lanes;
     int count = history.size();
     for(int i = 0; i < count; i++)
     {
-        GitCommitInfo &commit = history[i];
+        git::CommitInfo &commit = history[i];
 
         bool found = false;
         for(int li = 0; li < lanes.size(); li++)
@@ -307,7 +307,7 @@ void GitLogModel::updateGraph()
     }
 }
 
-GitCommitInfo GitLogModel::getCommitInfo(const QModelIndex &index) const
+git::CommitInfo GitLogModel::getCommitInfo(const QModelIndex &index) const
 {
     if ( index.isValid() )
     {

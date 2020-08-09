@@ -3,12 +3,16 @@
 
 #include <QStyledItemDelegate>
 #include <GitTools/base.h>
+#include <GitTools/CommitInfo.h>
 
 class QGitLogDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
+
+    using GraphLane = git::GraphLane;
+
     QGitLogDelegate(QObject *parent = nullptr);
 
     //ListViewDelegate(Git* git, ListViewProxy* lp, QObject* parent);

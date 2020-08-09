@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES +=
 
 HEADERS += \
+    GitTools/CommitInfo.h \
     GitTools/base.h \
     GitTools/string.h \
     GitTools/exception.h
