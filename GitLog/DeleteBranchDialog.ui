@@ -9,7 +9,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Delete Branch</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QGroupBox {
