@@ -24,6 +24,9 @@ SOURCES += \
 
 HEADERS += \
     GitTools/CommitInfo.h \
+    GitTools/CreateBranchDialog.h \
+    GitTools/DeleteBranchDialog.h \
+    GitTools/ExceptionTooltip.h \
     GitTools/GitCommitFiles.h \
     GitTools/GitDiffProcess.h \
     GitTools/GitLogDelegate.h \
@@ -37,3 +40,8 @@ unix {
     target.path = $$[QT_INSTALL_PLUGINS]/generic
 }
 !isEmpty(target.path): INSTALLS += target
+
+FORMS += \
+    GitTools/CreateBranchDialog.ui \
+    GitTools/DeleteBranchDialog.ui \
+    GitTools/ExceptionTooltip.ui

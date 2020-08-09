@@ -4,9 +4,9 @@
 #include <QDebug>
 #include <QDialog>
 #include <GitTools/base.h>
+#include <GitTools/ExceptionTooltip.h>
 #include <GitTools/GitLogModel.h>
 #include "ui_DeleteBranchDialog.h"
-#include "ExceptionTooltip.h"
 
 namespace git
 {

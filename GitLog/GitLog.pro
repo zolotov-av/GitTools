@@ -30,20 +30,14 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
-    CreateBranchDialog.h \
-    DeleteBranchDialog.h \
-    ExceptionTooltip.h \
     LogWindow.h
 
 FORMS += \
-    CreateBranchDialog.ui \
-    DeleteBranchDialog.ui \
-    ExceptionTooltip.ui \
     LogWindow.ui
 
 
-INCLUDEPATH += $$PWD/../gtcore
-DEPENDPATH += $$PWD/../gtcore
+INCLUDEPATH += $$PWD/../gtcore $$OUT_PWD/../gtcore
+DEPENDPATH += $$PWD/../gtcore $$OUT_PWD/../gtcore
 
 LIBS += -lgit2
 unix: LIBS += -L$$OUT_PWD/../gtcore/ -lgtcore

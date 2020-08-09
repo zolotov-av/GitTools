@@ -3,15 +3,11 @@
 
 #include <QDialog>
 #include <QDebug>
-#include <QCloseEvent>
 #include <QHideEvent>
-#include <QToolTip>
-#include <QTimer>
-#include "ui_CreateBranchDialog.h"
 #include <GitTools/base.h>
-#include <QMessageBox>
+#include <GitTools/ExceptionTooltip.h>
 #include <GitTools/GitLogModel.h>
-#include "ExceptionTooltip.h"
+#include "ui_CreateBranchDialog.h"
 
 class CreateBranchDialog : public QDialog, Ui::CreateBranchDialog
 {

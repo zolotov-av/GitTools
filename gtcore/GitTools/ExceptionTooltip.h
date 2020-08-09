@@ -1,13 +1,13 @@
 #ifndef GT_EXCEPTION_TOOLTIP_H
 #define GT_EXCEPTION_TOOLTIP_H
 
+#include <QDebug>
 #include <QWidget>
 #include <QTimer>
-#include "ui_ExceptionTooltip.h"
-#include <GitTools/exception.h>
-#include <QDebug>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <GitTools/exception.h>
+#include "ui_ExceptionTooltip.h"
 
 class ExceptionTooltip: public QWidget, protected Ui::ExceptionTooltip
 {

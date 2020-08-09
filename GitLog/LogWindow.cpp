@@ -4,8 +4,8 @@
 #include <GitTools/GitLogModel.h>
 #include <GitTools/GitCommitFiles.h>
 #include <GitTools/GitLogDelegate.h>
-#include "CreateBranchDialog.h"
-#include "DeleteBranchDialog.h"
+#include <GitTools/CreateBranchDialog.h>
+#include <GitTools/DeleteBranchDialog.h>
 
 #include <QDebug>
 #include <QDir>
