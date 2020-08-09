@@ -26,7 +26,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    CreateBranchDialog.cpp \
         main.cpp \
         logwindow.cpp \
     gitlogmodel.cpp \
