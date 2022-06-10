@@ -45,3 +45,6 @@ unix: PRE_TARGETDEPS += $$OUT_PWD/../gtcore/libgtcore.a
 
 target.path = /usr/local/bin
 INSTALLS += target
+
+RESOURCES += \
+    ../resources.qrc

@@ -12,11 +12,35 @@
 #include <QFileDialog>
 #include <QResizeEvent>
 
+void LogWindow::closeToTray(bool was_maximized)
+{
+    m_maximizedTray = was_maximized;
+    setWindowState(windowState() & ~Qt::WindowMaximized);
+    hide();
+}
+
+void LogWindow::openFromTray()
+{
+    if ( m_maximizedTray ) showMaximized();
+    else if ( isMinimized() ) showNormal();
+    else show();
+    raise();
+    activateWindow();
+    update();
+}
+
 LogWindow::LogWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::LogWindow)
 {
     ui->setupUi(this);
+
+    m_systrayIcon->setIcon(QIcon(":/icons/folder-blue-git-icon.png"));
+    m_systrayIcon->setToolTip(QStringLiteral("GitLog"));
+    const auto systrayMenu = new QMenu(this);
+    systrayMenu->addAction(ui->actionExit);
+    m_systrayIcon->setContextMenu(systrayMenu);
+    m_systrayIcon->show();
 
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
@@ -36,10 +60,12 @@ LogWindow::LogWindow(QWidget *parent) :
     ui->commitView->setModel(filesModel);
     ui->commitView->installEventFilter(this);
 
+    connect(m_systrayIcon, &QSystemTrayIcon::activated, this, &LogWindow::systrayActivated);
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
     connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
     connect(ui->actionDisplayTags, &QAction::toggled, this, &LogWindow::displayTagsToggled);
+    connect(ui->actionExit, &QAction::triggered, this, &LogWindow::exitTriggered);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
@@ -101,6 +127,15 @@ void LogWindow::update()
     refresh(ui->actionAllBranches->isChecked());
 }
 
+void LogWindow::systrayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    if ( reason == QSystemTrayIcon::Trigger )
+    {
+        if ( isVisible() ) closeToTray();
+        else openFromTray();
+    }
+}
+
 void LogWindow::refresh(bool checked)
 {
     if ( repo.isOpened() )
@@ -135,6 +170,11 @@ void LogWindow::openRepository(const QString &path)
     repo.open(path);
     cache->setValue("repo/path", path);
     update();
+}
+
+void LogWindow::exitTriggered(bool)
+{
+    qApp->quit();
 }
 
 void LogWindow::commitSelected(const QModelIndex &index)
@@ -230,4 +270,44 @@ void LogWindow::resizeEvent(QResizeEvent *event)
     cache->setValue("window/maximized", isMaximized() ? "yes" : "no");
     cache->setValue("window/width", event->size().width());
     cache->setValue("window/height", event->size().height());
+}
+
+void LogWindow::changeEvent(QEvent *event)
+{
+    if ( event->type() == QEvent::WindowStateChange )
+    {
+        const bool was_maximized = m_maximized;
+        m_maximized = isMaximized();
+        const bool now_minimized = isMinimized();
+
+        if ( !now_minimized && m_minimized )
+        {
+            m_minimized = false;
+        }
+
+        if ( now_minimized )
+        {
+            if ( m_minimizeTray )
+            {
+                event->ignore();
+                closeToTray(was_maximized);
+                return;
+            }
+
+            if ( !m_minimized )
+            {
+                m_minimized = true;
+                m_maximizedTray = isMaximized();
+            }
+        }
+    }
+}
+
+void LogWindow::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+    if ( m_minimizeTray )
+    {
+        closeToTray();
+    }
 }

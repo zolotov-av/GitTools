@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSettings>
+#include <QSystemTrayIcon>
 #include <GitTools/base.h>
 
 namespace Ui {
@@ -18,6 +19,15 @@ class LogWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
+
+    void closeToTray()
+    {
+        closeToTray(isMaximized());
+    }
+    void closeToTray(bool was_maximized);
+    void openFromTray();
+
 public:
     explicit LogWindow(QWidget *parent = 0);
     ~LogWindow();
@@ -26,10 +36,12 @@ public:
 
 public slots:
 
+    void systrayActivated(QSystemTrayIcon::ActivationReason reason);
     void refresh(bool checked);
     void displayTagsToggled(bool checked);
     void openRepository();
     void openRepository(const QString &path);
+    void exitTriggered(bool);
 
 private slots:
 
@@ -49,6 +61,8 @@ protected:
 
     bool eventFilter(QObject *obj, QEvent *ev) override;
     void resizeEvent(QResizeEvent *event) override;
+    void changeEvent(QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::LogWindow *ui;
@@ -58,8 +72,14 @@ private:
     GitLogDelegate* logDelegate;
     GitCommitFiles *filesModel;
     GitLogView *logView;
+    QSystemTrayIcon *m_systrayIcon { new QSystemTrayIcon(this) };
 
     git::repository repo;
+
+    bool m_minimized {false};
+    bool m_maximized {false};
+    bool m_minimizeTray {true};
+    bool m_maximizedTray {false};
 
 };
 
