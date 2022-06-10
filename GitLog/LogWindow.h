@@ -23,6 +23,7 @@ public:
 
 public slots:
 
+    void allBranchesToggled(bool checked);
     void openRepository();
     void openRepository(const QString &path);
 

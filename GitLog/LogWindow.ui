@@ -40,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>692</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menurepo">
@@ -58,6 +58,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionAllBranches"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRepoOpen">
@@ -76,6 +77,14 @@
   <action name="actionDeleteBranch">
    <property name="text">
     <string>DeleteBranch</string>
+   </property>
+  </action>
+  <action name="actionAllBranches">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>All branches</string>
    </property>
   </action>
  </widget>

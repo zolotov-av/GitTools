@@ -623,6 +623,11 @@ namespace git
             close();
         }
 
+        bool isOpened() const
+        {
+            return r != nullptr;
+        }
+
         void operator = (repository &&other)
         {
             close();

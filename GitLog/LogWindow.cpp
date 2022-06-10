@@ -36,6 +36,7 @@ LogWindow::LogWindow(QWidget *parent) :
     ui->commitView->installEventFilter(this);
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
+    connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::allBranchesToggled);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
@@ -92,6 +93,21 @@ LogWindow::~LogWindow()
     delete ui;
 }
 
+void LogWindow::allBranchesToggled(bool checked)
+{
+    if ( repo.isOpened() )
+    {
+        if ( checked )
+        {
+            logModel->openAllRefs();
+        }
+        else
+        {
+            logModel->open(repo.get_head());
+        }
+    }
+}
+
 void LogWindow::openRepository()
 {
     qDebug() << "openRepository";
@@ -104,8 +120,14 @@ void LogWindow::openRepository(const QString &path)
 {
     repo.open(path);
     cache->setValue("repo/path", path);
-    //logModel->open(repo->head());
-    logModel->openAllRefs();
+    if ( ui->actionAllBranches->isChecked() )
+    {
+        logModel->openAllRefs();
+    }
+    else
+    {
+        logModel->open(repo.get_head());
+    }
 }
 
 void LogWindow::commitSelected(const QModelIndex &index)
