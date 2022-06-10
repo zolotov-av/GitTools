@@ -12,6 +12,7 @@ class LogWindow;
 class GitLogView;
 class GitLogModel;
 class GitCommitFiles;
+class GitLogDelegate;
 
 class LogWindow : public QMainWindow
 {
@@ -21,9 +22,12 @@ public:
     explicit LogWindow(QWidget *parent = 0);
     ~LogWindow();
 
+    void update();
+
 public slots:
 
     void refresh(bool checked);
+    void displayTagsToggled(bool checked);
     void openRepository();
     void openRepository(const QString &path);
 
@@ -51,6 +55,7 @@ private:
 
     QSettings *cache;
     GitLogModel *logModel;
+    GitLogDelegate* logDelegate;
     GitCommitFiles *filesModel;
     GitLogView *logView;
 

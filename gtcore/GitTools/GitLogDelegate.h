@@ -15,6 +15,12 @@ public:
 
     GitLogDelegate(QObject *parent = nullptr);
 
+    bool displayTags() const { return m_display_tags; }
+    void setDisplayTags(bool value)
+    {
+        m_display_tags = value;
+    }
+
     //ListViewDelegate(Git* git, ListViewProxy* lp, QObject* parent);
 
     virtual void paint(QPainter* p, const QStyleOptionViewItem& o, const QModelIndex &i) const;
@@ -44,6 +50,8 @@ private:
     //ListViewProxy* lp;
     //int laneHeight;
     //int diffTargetRow;
+
+    bool m_display_tags {false};
 };
 
 #endif // GT_GITLOG_DELEGATE_H

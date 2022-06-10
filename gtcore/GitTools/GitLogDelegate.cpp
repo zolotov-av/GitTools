@@ -22,6 +22,7 @@ const QColor GT_Green("#00B64F");
 const QColor GT_Red("#FF3500");
 const QColor GT_Orange("#FF8900");
 const QColor GT_Blue("#086FA1");
+const QColor GT_Tag("#febc70");
 
 GitLogDelegate::GitLogDelegate(QObject *parent): QStyledItemDelegate(parent)
 {
@@ -156,6 +157,7 @@ void GitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git:
 
     if ( ref.isHead ) p->setBrush(GT_Red);
     else if ( ref.isBranch ) p->setBrush(GT_Green);
+    else if ( ref.isTag ) p->setBrush(GT_Tag);
     else p->setBrush(GT_Orange);
     p->setRenderHints(QPainter::Antialiasing, false);
     //p->drawRoundedRect(pbox, 2*spacing, 2*spacing, Qt::AbsoluteSize);
@@ -182,7 +184,7 @@ void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const 
 
     for(const auto &ref : model->refs)
     {
-        if ( (ref.isBranch || ref.isRemote) && (ref.target == commit.oid()) )
+        if ( (ref.isBranch || ref.isRemote || (ref.isTag && m_display_tags)) && (ref.target == commit.oid()) )
         {
             paintRef(p, opt, ref);
         }
@@ -209,7 +211,7 @@ void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const 
     //if (isHighlighted)
     //	newOpt.font.setBold(true);
 
-    QPen pen = p->pen();
+    //QPen pen = p->pen();
     //pen.setWidth(border);
     //p->setPen(Qt::NoPen);
     //p->setBrush(DARK_GREEN);

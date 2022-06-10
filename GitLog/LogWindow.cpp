@@ -21,9 +21,10 @@ LogWindow::LogWindow(QWidget *parent) :
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
 
-    GitLogDelegate* gld = new GitLogDelegate(this);
-    //gld->setLaneHeight(fontMetrics().height());
-    ui->logView->setItemDelegate(gld);
+    logDelegate = new GitLogDelegate(this);
+    logDelegate->setDisplayTags(ui->actionDisplayTags->isChecked());
+    //logDelegate->setLaneHeight(fontMetrics().height());
+    ui->logView->setItemDelegate(logDelegate);
     ui->logView->addAction(ui->actionCreateBranch);
     ui->logView->addAction(ui->actionDeleteBranch);
 
@@ -38,6 +39,7 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
     connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
+    connect(ui->actionDisplayTags, &QAction::toggled, this, &LogWindow::displayTagsToggled);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
@@ -94,6 +96,11 @@ LogWindow::~LogWindow()
     delete ui;
 }
 
+void LogWindow::update()
+{
+    refresh(ui->actionAllBranches->isChecked());
+}
+
 void LogWindow::refresh(bool checked)
 {
     if ( repo.isOpened() )
@@ -109,6 +116,12 @@ void LogWindow::refresh(bool checked)
     }
 }
 
+void LogWindow::displayTagsToggled(bool checked)
+{
+    logDelegate->setDisplayTags(checked);
+    update();
+}
+
 void LogWindow::openRepository()
 {
     qDebug() << "openRepository";
@@ -121,14 +134,7 @@ void LogWindow::openRepository(const QString &path)
 {
     repo.open(path);
     cache->setValue("repo/path", path);
-    if ( ui->actionAllBranches->isChecked() )
-    {
-        logModel->openAllRefs();
-    }
-    else
-    {
-        logModel->open(repo.get_head());
-    }
+    update();
 }
 
 void LogWindow::commitSelected(const QModelIndex &index)

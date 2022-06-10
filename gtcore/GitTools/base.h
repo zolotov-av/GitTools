@@ -196,6 +196,7 @@ namespace git
         bool isHead = false;
         bool isBranch = false;
         bool isRemote = false;
+        bool isTag = false;
 
         reference_info(const git::reference &ref):
             name(ref.name()),
@@ -203,7 +204,8 @@ namespace git
             target(ref.resolve().target()),
             isHead(ref.isHead()),
             isBranch(ref.isBranch()),
-            isRemote(ref.isRemote())
+            isRemote(ref.isRemote()),
+            isTag(ref.isTag())
         {
         }
     };

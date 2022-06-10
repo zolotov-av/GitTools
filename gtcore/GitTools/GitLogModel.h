@@ -38,6 +38,8 @@ protected:
     QVector<git::CommitInfo> history;
     QList<git::reference_info> refs;
 
+    bool m_display_tags {false};
+
     void clear();
     void updateRefs();
     void updateGraph();

@@ -60,6 +60,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionAllBranches"/>
+   <addaction name="actionDisplayTags"/>
    <addaction name="actionRefresh"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -92,6 +93,14 @@
   <action name="actionRefresh">
    <property name="text">
     <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actionDisplayTags">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Display tags</string>
    </property>
   </action>
  </widget>
