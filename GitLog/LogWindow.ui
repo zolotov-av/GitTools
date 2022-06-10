@@ -48,6 +48,7 @@
      <string>&amp;Repo</string>
     </property>
     <addaction name="actionRepoOpen"/>
+    <addaction name="actionRefresh"/>
    </widget>
    <addaction name="menurepo"/>
   </widget>
@@ -59,6 +60,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionAllBranches"/>
+   <addaction name="actionRefresh"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRepoOpen">
@@ -85,6 +87,11 @@
    </property>
    <property name="text">
     <string>All branches</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
    </property>
   </action>
  </widget>

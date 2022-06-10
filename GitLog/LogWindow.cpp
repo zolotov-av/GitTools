@@ -36,7 +36,8 @@ LogWindow::LogWindow(QWidget *parent) :
     ui->commitView->installEventFilter(this);
 
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
-    connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::allBranchesToggled);
+    connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
+    connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
@@ -93,7 +94,7 @@ LogWindow::~LogWindow()
     delete ui;
 }
 
-void LogWindow::allBranchesToggled(bool checked)
+void LogWindow::refresh(bool checked)
 {
     if ( repo.isOpened() )
     {
