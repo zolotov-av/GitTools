@@ -44,14 +44,16 @@ static inline int get_row_height(const QFontMetrics &fm)
     return get_border(fm)*6 + fm.height();
 }
 
+
+void GitLogDelegate::paintBackground(QPainter *p, const QStyleOptionViewItem &opt) const
+{
+    const auto brush = (opt.state & QStyle::State_Selected) ? opt.palette.highlight() : opt.backgroundBrush;
+    p->fillRect(opt.rect, brush);
+}
+
 void GitLogDelegate::paintGraph(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
 {
-    if (opt.state & QStyle::State_Selected)
-        p->fillRect(opt.rect, opt.palette.highlight());
-    else if (index.row() & 1)
-        p->fillRect(opt.rect, opt.palette.alternateBase());
-    else
-        p->fillRect(opt.rect, opt.palette.base());
+    paintBackground(p, opt);
 
     const GitLogModel *model = static_cast<const GitLogModel*>(index.model());
 
@@ -172,15 +174,12 @@ void GitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git:
 
 void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const
 {
+    paintBackground(p, o);
+
     const GitLogModel *model = static_cast<const GitLogModel*>(index.model());
     auto commit = model->getCommitInfo(index);
 
     QStyleOptionViewItem opt(o); // we need a copy
-
-    if ( opt.state & QStyle::State_Selected )
-    {
-        p->fillRect(opt.rect, opt.palette.highlight());
-    }
 
     for(const auto &ref : model->refs)
     {

@@ -36,6 +36,7 @@ public slots:
 
 private:
     //const Rev* revLookup(int row, FileHistory** fhPtr = NULL) const;
+    void paintBackground(QPainter* p, const QStyleOptionViewItem& opt) const;
     void paintGraph(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& i) const;
     void paintRef(QPainter *p, QStyleOptionViewItem &opt, const git::reference_info &ref) const;
     void paintLog(QPainter *p, const QStyleOptionViewItem& o, const QModelIndex &i) const;
