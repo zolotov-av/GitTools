@@ -1,13 +1,35 @@
 #include "LogWindow.h"
+#include "DBusInterface.h"
 #include <QApplication>
 #include <git2.h>
+
+using namespace git;
 
 int main(int argc, char *argv[])
 {
     git_libgit2_init();
 
     QApplication a(argc, argv);
+    DBusInterface dbus;
+
+    if ( dbus.isRunning() )
+    {
+        printf("already running...\n");
+        dbus.showGitLog();
+        return 0;
+    }
+
+    if ( !dbus.registerObject() )
+    {
+        printf("cannot register dbus service...");
+        return 1;
+    }
+
     LogWindow w;
+
+    QObject::connect(&dbus, &DBusInterface::showGitLogRequested, &w, &LogWindow::openFromTray);
+    QObject::connect(&dbus, &DBusInterface::exitRequested, &w, &LogWindow::exit);
+
     w.show();
 
     int exitCode = a.exec();

@@ -26,7 +26,6 @@ private:
         closeToTray(isMaximized());
     }
     void closeToTray(bool was_maximized);
-    void openFromTray();
 
 public:
     explicit LogWindow(QWidget *parent = 0);
@@ -41,7 +40,8 @@ public slots:
     void displayTagsToggled(bool checked);
     void openRepository();
     void openRepository(const QString &path);
-    void exitTriggered(bool);
+    void exit();
+    void openFromTray();
 
 private slots:
 

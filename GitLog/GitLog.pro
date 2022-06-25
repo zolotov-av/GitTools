@@ -4,14 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+TEMPLATE = app
+TARGET = GitLog
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += core gui widgets dbus
 
 CONFIG += c++17
-
-TARGET = GitLog
-TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -26,15 +24,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    DBusInterface.cpp \
     LogWindow.cpp \
     main.cpp
 
 HEADERS += \
+    DBusInterface.h \
     LogWindow.h
 
 FORMS += \
     LogWindow.ui
 
+RESOURCES += \
+    ../resources.qrc
 
 INCLUDEPATH += $$PWD/../gtcore $$OUT_PWD/../gtcore
 DEPENDPATH += $$PWD/../gtcore $$OUT_PWD/../gtcore
@@ -45,6 +47,3 @@ unix: PRE_TARGETDEPS += $$OUT_PWD/../gtcore/libgtcore.a
 
 target.path = /usr/local/bin
 INSTALLS += target
-
-RESOURCES += \
-    ../resources.qrc

@@ -65,7 +65,7 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
     connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
     connect(ui->actionDisplayTags, &QAction::toggled, this, &LogWindow::displayTagsToggled);
-    connect(ui->actionExit, &QAction::triggered, this, &LogWindow::exitTriggered);
+    connect(ui->actionExit, &QAction::triggered, this, &LogWindow::exit);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
     connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
@@ -172,8 +172,9 @@ void LogWindow::openRepository(const QString &path)
     update();
 }
 
-void LogWindow::exitTriggered(bool)
+void LogWindow::exit()
 {
+    printf("LogWindow::exit()\n");
     qApp->quit();
 }
 
