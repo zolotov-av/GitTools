@@ -136,7 +136,7 @@ bool GitLogModel::openAllRefs()
     git::revwalk revwalk = repo->new_revwalk();
     revwalk.setSorting(GIT_SORT_TOPOLOGICAL);
     revwalk.push("HEAD");
-    for(const auto &ref : refs)
+    for(const auto &ref : refs())
     {
         try
         {
@@ -173,13 +173,13 @@ void GitLogModel::clear()
 {
     beginResetModel();
     history.clear();
-    refs.clear();
+    m_refs.clear();
     endResetModel();
 }
 
 void GitLogModel::updateRefs()
 {
-    refs.clear();
+    m_refs.clear();
     git_reference_iterator *iter;
     int status = git_reference_iterator_new(&iter, repo->data());
     if ( status == 0 )
@@ -193,7 +193,7 @@ void GitLogModel::updateRefs()
             {
                 break;
             }
-            refs.append(git::reference(ref));
+            m_refs.append(git::reference(ref));
         }
 
         git_reference_iterator_free(iter);

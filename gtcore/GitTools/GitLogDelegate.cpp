@@ -26,7 +26,12 @@ const QColor GT_Tag("#febc70");
 
 GitLogDelegate::GitLogDelegate(QObject *parent): QStyledItemDelegate(parent)
 {
-    qDebug() << "QGitLogDelegate create";
+    qDebug() << "GitLogDelegate create";
+}
+
+GitLogDelegate::~GitLogDelegate()
+{
+    qDebug() << "GitLogDelegate destroy";
 }
 
 static inline int get_border(const QFontMetrics &fm)
@@ -144,7 +149,6 @@ void GitLogDelegate::paintRef(QPainter *p, QStyleOptionViewItem &opt, const git:
     QFontMetrics fm(opt.font);
     const QString name = ref.short_name;
     QRect box = fm.boundingRect(name);
-    //qDebug() << "fm.height=" << fm.height() << "box.height=" << box.height();
 
     const int spacing = get_spacing(fm);
     const int border = get_border(fm);
@@ -181,43 +185,13 @@ void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const 
 
     QStyleOptionViewItem opt(o); // we need a copy
 
-    for(const auto &ref : model->refs)
+    for(const auto &ref : model->refs())
     {
         if ( (ref.isBranch || ref.isRemote || (ref.isTag && m_display_tags)) && (ref.target == commit.oid()) )
         {
             paintRef(p, opt, ref);
         }
     }
-
-    //if (r->isDiffCache)
-    //	p->fillRect(opt.rect, changedFiles(ZERO_SHA) ? ORANGE : DARK_ORANGE);
-
-    //if (diffTargetRow == row)
-    //    p->fillRect(opt.rect, LIGHT_BLUE);
-
-    //bool isHighlighted = lp->isHighlighted(row);
-    //QPixmap* pm = getTagMarks(r->sha(), opt);
-
-    //if (!pm && !isHighlighted) { // fast path in common case
-    //	QItemDelegate::paint(p, opt, index);
-    //	return;
-    //}
-    //if (pm) {
-    //	p->drawPixmap(newOpt.rect.x(), newOpt.rect.y(), *pm);
-        //newOpt.rect.adjust(box.width() + 2*spacing, 0, 0, 0);
-    //	delete pm;
-    //}
-    //if (isHighlighted)
-    //	newOpt.font.setBold(true);
-
-    //QPen pen = p->pen();
-    //pen.setWidth(border);
-    //p->setPen(Qt::NoPen);
-    //p->setBrush(DARK_GREEN);
-    //p->drawRoundedRect(spacing*2, spacing*2, pw, ph, border*4, border*4, Qt::AbsoluteSize);
-    //p->setPen(Qt::NoPen);
-    //p->setBrush(LIGHT_BLUE);
-    //p->drawRect(spacing, spacing, pw, ph);
 
     QFontMetrics fm(opt.font);
     const int spacing = get_spacing(fm);
@@ -231,10 +205,8 @@ void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const 
         p->setPen(opt.palette.color(QPalette::Active, QPalette::Text));
     }
 
-    //p->translate(opt.rect.left(), opt.rect.top());
     p->drawText(opt.rect.adjusted(spacing, 0, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
     p->restore();
-    //QStyledItemDelegate::paint(p, opt, index);
 }
 
 void GitLogDelegate::paint(QPainter* p, const QStyleOptionViewItem& opt, const QModelIndex& index) const
@@ -254,5 +226,4 @@ QSize GitLogDelegate::sizeHint(const QStyleOptionViewItem &opt, const QModelInde
 {
     QFontMetrics fm(opt.font);
     return QSize( 15*fm.averageCharWidth(), get_row_height(fm) );
-    //return QSize(laneWidth(), laneHeight);
 }

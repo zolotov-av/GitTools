@@ -5,15 +5,38 @@
 #include <GitTools/base.h>
 #include <GitTools/CommitInfo.h>
 
-class GitLogModel : public QAbstractItemModel
+class GitLogModel final: public QAbstractItemModel
 {
-friend class GitLogDelegate;
-public:
+    Q_OBJECT
+
+private:
 
     using GraphLane = git::GraphLane;
 
+    git::repository *repo { nullptr };
+
+    QVector<git::CommitInfo> history;
+    QList<git::reference_info> m_refs;
+
+    void clear();
+    void updateRefs();
+    void updateGraph();
+
+public:
+
     GitLogModel(QObject *parent);
-    ~GitLogModel() override;
+    GitLogModel(const GitLogModel &) = delete;
+    GitLogModel(GitLogModel &&) = delete;
+
+    ~GitLogModel();
+
+    GitLogModel& operator = (const GitLogModel &) = delete;
+    GitLogModel& operator = (GitLogModel &&) = delete;
+
+    const QList<git::reference_info>& refs() const
+    {
+        return m_refs;
+    }
 
     void setRepository(git::repository *repo);
 
@@ -30,19 +53,6 @@ public:
     void update();
 
     git::CommitInfo getCommitInfo(const QModelIndex &index) const;
-
-protected:
-
-    git::repository *repo = nullptr;
-
-    QVector<git::CommitInfo> history;
-    QList<git::reference_info> refs;
-
-    bool m_display_tags {false};
-
-    void clear();
-    void updateRefs();
-    void updateGraph();
 
 };
 
