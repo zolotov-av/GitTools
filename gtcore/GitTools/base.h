@@ -736,10 +736,27 @@ namespace git
             return r;
         }
 
+        git::diff diff()
+        {
+            git_diff *d;
+            git_diff_options opts { };
+            opts.version = GIT_DIFF_OPTIONS_VERSION;
+            opts.flags = GIT_DIFF_INCLUDE_UNTRACKED;
+            check( git_diff_index_to_workdir(&d, r, nullptr, &opts) );
+            return d;
+        }
+
         git::diff diff(const git::tree &a, const git::tree &b)
         {
             git_diff *d;
             check( git_diff_tree_to_tree(&d, r, a.data(), b.data(), nullptr) );
+            return d;
+        }
+
+        git::diff diff_cached(const git::tree &a)
+        {
+            git_diff *d;
+            check( git_diff_tree_to_index(&d, r, a.data(), nullptr, nullptr) );
             return d;
         }
 

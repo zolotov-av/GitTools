@@ -20,6 +20,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     void open(git::repository *repo, const git::object_id &commit_oid);
+    void open_cached(git::repository *repo);
+    void open_worktree(git::repository *repo);
     void close();
 
     void execute(const QModelIndex &index);

@@ -103,16 +103,16 @@ QString GitCommitFiles::GetDiffPath(int index) const
     case GIT_DELTA_IGNORED:
     case GIT_DELTA_UNTRACKED:
     case GIT_DELTA_TYPECHANGE:
-    default:
-        return QStringLiteral("N/A");
+    case GIT_DELTA_ADDED:
+    case GIT_DELTA_COPIED:
+        return delta.newFile().path();
     case GIT_DELTA_UNMODIFIED:
     case GIT_DELTA_DELETED:
     case GIT_DELTA_MODIFIED:
     case GIT_DELTA_RENAMED:
         return delta.oldFile().path();
-    case GIT_DELTA_ADDED:
-    case GIT_DELTA_COPIED:
-        return delta.newFile().path();
+    default:
+        return QStringLiteral("N/A");
     }
 }
 
@@ -170,6 +170,26 @@ void GitCommitFiles::open(git::repository *repo, const git::object_id &commit_oi
         active = false;
     }
     this->endResetModel();
+}
+
+void GitCommitFiles::open_cached(git::repository *repo)
+{
+    beginResetModel();
+    commit = repo->get_commit(repo->get_head().target());
+    diff = repo->diff_cached(commit);
+    this->repo = repo;
+    active = true;
+    endResetModel();
+}
+
+void GitCommitFiles::open_worktree(git::repository *repo)
+{
+    beginResetModel();
+    commit = { };
+    diff = repo->diff();
+    this->repo = repo;
+    active = true;
+    endResetModel();
 }
 
 void GitCommitFiles::close()
