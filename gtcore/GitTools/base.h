@@ -34,25 +34,28 @@ namespace git
     {
     private:
 
-        git_oid m_oid;
+        git_oid m_oid { };
 
     public:
 
-        object_id() = default;
-        object_id(const object_id &) = default;
-        object_id(object_id &&) = default;
+        constexpr object_id() = default;
+        constexpr object_id(const object_id &) = default;
+        constexpr object_id(object_id &&) = default;
 
-        object_id(const git_oid *o)
+        constexpr object_id(const git_oid &o)
         {
-            if ( o ) memcpy(&m_oid, o, sizeof(m_oid));
+            m_oid = o;
+        }
+
+        constexpr object_id(const git_oid *o)
+        {
+            if ( o ) m_oid = *o;
         }
 
         object_id(const string &hash)
         {
             check( git_oid_fromstr(&m_oid, std_string(hash).c_str()) );
         }
-
-        ~object_id() = default;
 
         object_id& operator = (const object_id &) = default;
         object_id& operator = (object_id &&) = default;
@@ -72,6 +75,11 @@ namespace git
         bool operator != (const object_id &o) const
         {
             return memcmp(m_oid.id, o.m_oid.id, sizeof(m_oid.id)) != 0;
+        }
+
+        bool isNull() const
+        {
+            return git_oid_iszero(&m_oid);
         }
 
         const git_oid* data() const
@@ -512,19 +520,23 @@ namespace git
     {
     private:
 
-        const git_diff_file *f = nullptr;
+        const git_diff_file *f { nullptr };
 
     public:
 
-        diff_file() = default;
-        diff_file(const diff_file &) = default;
-        diff_file(diff_file &&) = default;
+        constexpr diff_file() = default;
+        constexpr diff_file(const diff_file &) = default;
+        constexpr diff_file(diff_file &&) = default;
         diff_file(const git_diff_file *v): f(v) { }
-        ~diff_file() = default;
 
         string path() const
         {
             return anystr(f->path);
+        }
+
+        object_id oid() const
+        {
+            return f->id;
         }
 
         const git_diff_file* data() { return f; }
@@ -650,6 +662,11 @@ namespace git
             r = nullptr;
         }
 
+        const char* workdir() const
+        {
+            return git_repository_workdir(r);
+        }
+
         reference get_head() const
         {
             git_reference *ref;
@@ -736,10 +753,27 @@ namespace git
             return r;
         }
 
+        git::diff diff()
+        {
+            git_diff *d;
+            git_diff_options opts { };
+            opts.version = GIT_DIFF_OPTIONS_VERSION;
+            opts.flags = GIT_DIFF_INCLUDE_UNTRACKED;
+            check( git_diff_index_to_workdir(&d, r, nullptr, &opts) );
+            return d;
+        }
+
         git::diff diff(const git::tree &a, const git::tree &b)
         {
             git_diff *d;
             check( git_diff_tree_to_tree(&d, r, a.data(), b.data(), nullptr) );
+            return d;
+        }
+
+        git::diff diff_cached(const git::tree &a)
+        {
+            git_diff *d;
+            check( git_diff_tree_to_index(&d, r, a.data(), nullptr, nullptr) );
             return d;
         }
 

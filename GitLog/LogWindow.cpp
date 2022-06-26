@@ -186,10 +186,28 @@ void LogWindow::commitSelected(const QModelIndex &index)
     }
 
     auto commit = logModel->getCommitInfo(index);
+    if ( commit.isCommit() )
+    {
+        QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
+        ui->commitMessage->setText(message);
+        filesModel->open(&repo, commit.oid());
+    }
+    else if ( commit.isIndex() )
+    {
+        ui->commitMessage->setText(tr("Changes to be committed"));
+        filesModel->open_cached(&repo);
+    }
+    else if ( commit.isWorktree() )
+    {
+        ui->commitMessage->setText(tr("Changes not staged for commit"));
+        filesModel->open_worktree(&repo);
+    }
+    else
+    {
+        ui->commitMessage->setText(commit.message());
+        filesModel->close();
+    }
 
-    QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
-    ui->commitMessage->setText(message);
-    filesModel->open(&repo, commit.oid());
 }
 
 void LogWindow::fileClicked(const QModelIndex &index)
