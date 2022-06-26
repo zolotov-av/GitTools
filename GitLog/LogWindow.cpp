@@ -186,10 +186,18 @@ void LogWindow::commitSelected(const QModelIndex &index)
     }
 
     auto commit = logModel->getCommitInfo(index);
+    if ( commit.isCommit() )
+    {
+        QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
+        ui->commitMessage->setText(message);
+        filesModel->open(&repo, commit.oid());
+    }
+    else
+    {
+        ui->commitMessage->setText(commit.message());
+        filesModel->close();
+    }
 
-    QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
-    ui->commitMessage->setText(message);
-    filesModel->open(&repo, commit.oid());
 }
 
 void LogWindow::fileClicked(const QModelIndex &index)

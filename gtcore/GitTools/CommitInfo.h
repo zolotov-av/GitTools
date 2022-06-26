@@ -26,15 +26,34 @@ namespace git
 
     };
 
+    enum class CommitType {
+        invalid,
+        index,
+        worktree,
+        commit
+    };
+
+    inline const char* commitTypeName(CommitType type)
+    {
+        switch(type)
+        {
+        case CommitType::invalid: return "invalid";
+        case CommitType::index: return "index";
+        case CommitType::worktree: return "worktree";
+        case CommitType::commit: return "commit";
+        default: return "unknown";
+        }
+    }
+
     class CommitInfo
     {
     private:
 
-        git::object_id m_oid;
+        CommitType m_type { CommitType::invalid };
+        git::object_id m_oid { };
         QString m_message;
         QString m_author_name;
         QDateTime m_commit_time;
-        bool m_isValid = false;
 
     public:
 
@@ -45,15 +64,19 @@ namespace git
         QVector<git::object_id> parents;
         QVector<GraphLane> lanes;
 
-        bool isValid() const { return m_isValid; }
+        bool isValid() const { return m_type != CommitType::invalid; }
+        bool isCommit() const { return m_type == CommitType::commit; }
+        bool isIndex() const { return m_type == CommitType::index; }
+        bool isWorktree() const { return m_type == CommitType::worktree; }
 
         CommitInfo() = default;
+        CommitInfo(CommitType t): m_type(t), m_message(commitTypeName(t)) { }
         CommitInfo(const git::commit &commit):
+            m_type(CommitType::commit),
             m_oid(commit.id()),
             m_message(commit.message()),
             m_author_name(commit.author().name()),
             m_commit_time(commit.dateTime()),
-            m_isValid(true),
             parents(commit.parentCount())
         {
             for(unsigned i = 0; i < commit.parentCount(); i++)
@@ -62,9 +85,7 @@ namespace git
             }
         }
 
-        ~CommitInfo() = default;
-
-        QString message() const
+        const QString& message() const
         {
             return m_message;
         }
@@ -74,22 +95,22 @@ namespace git
             return m_message.left(maxLen).split(QRegExp("(\\r|\\n)")).first();
         }
 
-        QString author_name() const
+        const QString& author_name() const
         {
             return m_author_name;
         }
 
-        QDateTime commit_time() const
+        const QDateTime& commit_time() const
         {
             return m_commit_time;
         }
 
-        git::object_id oid() const
+        const git::object_id& oid() const
         {
             return m_oid;
         }
 
-        git::object_id parentId(unsigned i) const
+        const git::object_id& parentId(unsigned i) const
         {
             return parents[i];
         }
@@ -99,23 +120,28 @@ namespace git
             return parents.size();
         }
 
-        bool isRoot() const {
+        bool isRoot() const
+        {
             return parentCount() == 0;
         }
 
-        bool isTail() const {
+        bool isTail() const
+        {
             return childs.size() == 0;
         }
 
-        bool isBranch() const {
+        bool isBranch() const
+        {
             return childs.size() > 1;
         }
 
-        bool isMerge() const {
+        bool isMerge() const
+        {
             return parentCount() > 1;
         }
 
-        bool childOf(const CommitInfo &commit) const {
+        bool childOf(const CommitInfo &commit) const
+        {
             for(const auto &p_id : parents)
             {
                 if ( p_id == commit.oid() ) return true;
@@ -123,7 +149,8 @@ namespace git
             return false;
         }
 
-        bool parentOf(const CommitInfo &commit) const {
+        bool parentOf(const CommitInfo &commit) const
+        {
             return commit.childOf(*this);
         }
 

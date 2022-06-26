@@ -101,26 +101,22 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
 bool GitLogModel::open(const git::reference &reference)
 {
     beginResetModel();
+
+    updateRefs();
+
     git::revwalk revwalk = repo->new_revwalk();
     revwalk.push(reference.name());
     history.clear();
+    history.append(git::CommitType::index);
+    history.append(git::CommitType::worktree);
     git_oid commit_id;
     while ( revwalk.next(commit_id) )
     {
-        const git::commit c = repo->get_commit(&commit_id);
-        git::CommitInfo info { c };
-        if ( history.size() > 0 )
-        {
-            info.up = history[history.size()-1].childOf(info);
-            history[history.size()-1].down = info.up;
-        }
-        history.append(info);
-
+        auto commit = repo->get_commit(&commit_id);
+        history.append(commit);
     }
 
     updateGraph();
-
-    updateRefs();
 
     endResetModel();
 
@@ -149,6 +145,8 @@ bool GitLogModel::openAllRefs()
     }
 
     history.clear();
+    history.append(git::CommitType::index);
+    history.append(git::CommitType::worktree);
     git_oid commit_id;
     while ( revwalk.next(commit_id) )
     {
@@ -215,8 +213,11 @@ static git::GraphLane& getFreeLane(QVector<git::GraphLane> &lanes, int offset = 
 
 void GitLogModel::updateGraph()
 {
-    for(const auto &commit : history)
+    int count = history.size();
+    for(int i = 0; i < count; i++)
     {
+        const auto &commit = history[i];
+        if ( !commit.isCommit() ) continue;
         int parentCount = commit.parentCount();
         for(int i = 0; i < parentCount; i++)
         {
@@ -232,10 +233,10 @@ void GitLogModel::updateGraph()
     }
 
     QVector<git::GraphLane> lanes;
-    int count = history.size();
     for(int i = 0; i < count; i++)
     {
         git::CommitInfo &commit = history[i];
+        if ( !commit.isCommit() ) continue;
 
         bool found = false;
         for(int li = 0; li < lanes.size(); li++)
