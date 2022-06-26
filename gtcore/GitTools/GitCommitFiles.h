@@ -37,7 +37,6 @@ protected:
     QString GetDiffPath(int index) const;
     QString GetDiffExtension(int index) const;
 
-    void showDelta(const git::delta &delta);
 };
 
 #endif // GITCOMMITFILES_H

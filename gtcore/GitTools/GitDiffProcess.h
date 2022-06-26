@@ -14,6 +14,9 @@ public:
     ~GitDiffProcess();
 
     bool open(const git::blob &a, const git::blob &b);
+    bool open(const QString &a, const git::blob &b);
+    bool open(const git::blob &a, const QString &b);
+    bool open(const QString &a, const QString &b);
 
 signals:
 
