@@ -8,6 +8,13 @@
 class GitCommitFiles : public QAbstractItemModel
 {
 public:
+
+    enum Roles
+    {
+        fileNameRole = Qt::DisplayRole,
+        colorRole = Qt::ForegroundRole
+    };
+
     GitCommitFiles(QObject *parent);
     ~GitCommitFiles() override;
 
@@ -18,6 +25,7 @@ public:
     QModelIndex parent(const QModelIndex &child) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     void open(git::repository *repo, const git::object_id &commit_oid);
     void open_cached(git::repository *repo);

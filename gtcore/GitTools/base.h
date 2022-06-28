@@ -5,7 +5,6 @@
 #include <GitTools/exception.h>
 #include <git2.h>
 
-#include <vector>
 #include <QDebug>
 #include <QDateTime>
 
@@ -612,6 +611,60 @@ namespace git
 
     };
 
+    class config
+    {
+    private:
+
+        git_config *m_cfg { nullptr };
+    public:
+
+        config() { }
+        config(git_repository *repo)
+        {
+            check( git_repository_config(&m_cfg, repo) );
+            fprintf(stderr, "config opened\n");
+        }
+
+        ~config()
+        {
+            close();
+        }
+
+        void close()
+        {
+            git_config_free(m_cfg);
+            m_cfg = nullptr;
+            fprintf(stderr, "config closed\n");
+        }
+
+        QString getString(const char *name)
+        {
+            if ( m_cfg == nullptr )
+                return { };
+
+            fprintf(stderr, "getString: name=[%s]\n", name);
+
+            git_config_entry *entry;
+            check( git_config_get_entry(&entry, m_cfg, name) );
+
+            QString value = QString::fromUtf8(entry->value);
+
+            git_config_entry_free(entry);
+
+            return std::move(value);
+        }
+
+        QString getString(const QString &name)
+        {
+            if ( m_cfg == nullptr )
+                return { };
+
+            const auto uname = name.toUtf8();
+            return getString(uname.constData());
+        }
+
+    };
+
     class repository
     {
     public:
@@ -660,6 +713,11 @@ namespace git
             if ( r == nullptr ) return;
             git_repository_free(r);
             r = nullptr;
+        }
+
+        git::config config()
+        {
+            return git::config{r};
         }
 
         const char* workdir() const
@@ -775,6 +833,41 @@ namespace git
             git_diff *d;
             check( git_diff_tree_to_index(&d, r, a.data(), nullptr, nullptr) );
             return d;
+        }
+
+        void make_commit(const QString &author_name, const QString &author_email, const QString &message)
+        {
+            QByteArray name = author_name.toUtf8();
+            QByteArray email = author_email.toUtf8();
+            QByteArray msg = message.toUtf8();
+
+            git_oid tree_id, parent_id, commit_id;
+            git_tree *tree;
+            git_commit *parent;
+            git_index *index;
+
+            git_signature *author;
+            git_signature_now(&author, name.data(), email.data());
+
+            /* Get the index and write it to a tree */
+            git_repository_index(&index, r);
+            git_index_write_tree(&tree_id, index);
+            git_tree_lookup(&tree, r, &tree_id);
+
+            /* Get HEAD as a commit object to use as the parent of the commit */
+            git_reference_name_to_id(&parent_id, r, "HEAD");
+            git_commit_lookup(&parent, r, &parent_id);
+
+            const git_commit* parents[1];
+            parents[0] = parent;
+            git_commit_create(&commit_id, r, "HEAD", author, author, "UTF-8", msg.data(), tree, 1, parents);
+
+            git_index_read_tree(index, tree);
+
+            git_tree_free(tree);
+            git_commit_free(parent);
+            git_index_free(index);
+            git_signature_free(author);
         }
 
     };

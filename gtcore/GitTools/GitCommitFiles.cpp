@@ -175,6 +175,14 @@ QVariant GitCommitFiles::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+QHash<int, QByteArray> GitCommitFiles::roleNames() const
+{
+    return {
+        {fileNameRole, "fileName"},
+        {colorRole, "fileColor"}
+    };
+}
+
 void GitCommitFiles::open(git::repository *repo, const git::object_id &commit_oid)
 {
     this->beginResetModel();

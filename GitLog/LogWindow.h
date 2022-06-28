@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QSystemTrayIcon>
 #include <GitTools/base.h>
+#include "CommitDialog.h"
 
 namespace Ui {
 class LogWindow;
@@ -56,6 +57,8 @@ private slots:
 
     void on_actionCreateBranch_triggered();
     void on_actionDeleteBranch_triggered();
+    void openCommitDialog();
+    void doCommit();
 
 protected:
 
@@ -72,6 +75,7 @@ private:
     GitLogDelegate* logDelegate;
     GitCommitFiles *filesModel;
     GitLogView *logView;
+    CommitDialog *commitDialog { new CommitDialog(nullptr) };
     QSystemTrayIcon *m_systrayIcon { new QSystemTrayIcon(this) };
 
     git::repository repo;
