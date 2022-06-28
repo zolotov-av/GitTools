@@ -19,16 +19,16 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    LogWindow w;
+
+    QObject::connect(&dbus, &DBusInterface::showGitLogRequested, &w, &LogWindow::openFromTray);
+    QObject::connect(&dbus, &DBusInterface::exitRequested, &w, &LogWindow::exit);
+
     if ( !dbus.registerObject() )
     {
         printf("cannot register dbus service...");
         return 1;
     }
-
-    LogWindow w;
-
-    QObject::connect(&dbus, &DBusInterface::showGitLogRequested, &w, &LogWindow::openFromTray);
-    QObject::connect(&dbus, &DBusInterface::exitRequested, &w, &LogWindow::exit);
 
     w.show();
 
