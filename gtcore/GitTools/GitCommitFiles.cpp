@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QDebug>
+#include <QColor>
 #include <GitTools/GitDiffProcess.h>
 
 GitCommitFiles::GitCommitFiles(QObject *parent): QAbstractItemModel(parent), active(false), commit(), diff()
@@ -151,6 +152,23 @@ QVariant GitCommitFiles::data(const QModelIndex &index, int role) const
             return GetDiffStatus(index.row());
         default:
             return index.column() + 1;
+        }
+    }
+
+    if ( role == Qt::ForegroundRole )
+    {
+        switch (diff.get_delta(index.row()).type() )
+        {
+        case GIT_DELTA_IGNORED: return QColor(Qt::gray);
+        case GIT_DELTA_UNTRACKED: return QColor(Qt::red);
+        case GIT_DELTA_COPIED:
+        case GIT_DELTA_UNMODIFIED:
+        case GIT_DELTA_RENAMED:
+        case GIT_DELTA_TYPECHANGE: return QColor(Qt::green);
+        case GIT_DELTA_DELETED: return QColor(Qt::darkRed);
+        case GIT_DELTA_MODIFIED:
+        case GIT_DELTA_ADDED: return QColor(Qt::blue);
+        default: return QColor(Qt::black);
         }
     }
 
