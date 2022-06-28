@@ -197,7 +197,21 @@ void GitLogDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o, const 
     QFontMetrics fm(opt.font);
     const int spacing = get_spacing(fm);
     p->save();
-    if ( opt.state & QStyle::State_Selected )
+    if ( commit.isIndex() )
+    {
+        QFont font {opt.font};
+        font.setBold(true);
+        p->setFont(font);
+        p->setPen(Qt::darkGreen);
+    }
+    else if ( commit.isWorktree() )
+    {
+        QFont font {opt.font};
+        font.setBold(true);
+        p->setFont(font);
+        p->setPen(Qt::darkRed);
+    }
+    else if ( opt.state & QStyle::State_Selected )
     {
         p->setPen(opt.palette.color(QPalette::Active, QPalette::HighlightedText));
     }

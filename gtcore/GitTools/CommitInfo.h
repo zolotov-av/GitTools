@@ -38,8 +38,8 @@ namespace git
         switch(type)
         {
         case CommitType::invalid: return "invalid";
-        case CommitType::index: return "index";
-        case CommitType::worktree: return "worktree";
+        case CommitType::index: return "Changes to be committed";
+        case CommitType::worktree: return "Changes not staged for commit";
         case CommitType::commit: return "commit";
         default: return "unknown";
         }
