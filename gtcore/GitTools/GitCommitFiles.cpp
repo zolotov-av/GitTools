@@ -219,7 +219,7 @@ void GitCommitFiles::execute(const QModelIndex &index)
             const QString path = QDir(repo->workdir()).filePath(delta.newFile().path());
             if ( QFileInfo(path).isFile() )
             {
-                const QString command = QStringLiteral("/usr/bin/xed %1").arg(path);
+                const QString command = QStringLiteral("xdg-open %1").arg(path);
                 qDebug() << "GIT_DELTA_UNTRACKED:" << command;
                 QProcess::startDetached(command);
             }
