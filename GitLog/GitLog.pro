@@ -24,15 +24,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    CommitDialog.cpp \
     DBusInterface.cpp \
     LogWindow.cpp \
     main.cpp
 
 HEADERS += \
+    CommitDialog.h \
     DBusInterface.h \
     LogWindow.h
 
 FORMS += \
+    CommitDialog.ui \
     LogWindow.ui
 
 RESOURCES += \

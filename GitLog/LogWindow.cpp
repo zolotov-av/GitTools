@@ -64,6 +64,7 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
     connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
+    connect(ui->actionCommit, &QAction::triggered, commitDialog, &QDialog::exec);
     connect(ui->actionDisplayTags, &QAction::toggled, this, &LogWindow::displayTagsToggled);
     connect(ui->actionExit, &QAction::triggered, this, &LogWindow::exit);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
@@ -72,6 +73,7 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
     connect(ui->logView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(logViewColumnResized(int,int,int)));
     connect(ui->commitView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(commitViewColumnResized(int,int,int)));
+    connect(commitDialog, &CommitDialog::accepted, this, &LogWindow::doCommit);
 
     if ( cache->value("window/maximized", "no").toString() == "yes" )
     {
@@ -87,6 +89,9 @@ LogWindow::LogWindow(QWidget *parent) :
         }
 
     }
+
+    commitDialog->setAuthorName(cache->value("AuthorName").toString());
+    commitDialog->setAuthorEmail(cache->value("AuthorEmail").toString());
 
     auto header = ui->logView->header();
     for(int i = 0; i < 3; i++)
@@ -262,6 +267,17 @@ void LogWindow::on_actionDeleteBranch_triggered()
     dlg->setCommitId(&repo, commit.oid().toString());
     dlg->show();
 
+}
+
+void LogWindow::doCommit()
+{
+    const auto authorName = commitDialog->authorName();
+    const auto authorEmail = commitDialog->authorEmail();
+    repo.make_commit(authorName, authorEmail, commitDialog->message());
+    cache->setValue("AuthorName", authorName);
+    cache->setValue("AuthorEmail", authorEmail);
+    commitDialog->clearMessage();
+    update();
 }
 
 bool LogWindow::eventFilter(QObject *obj, QEvent *event)

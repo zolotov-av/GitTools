@@ -777,6 +777,41 @@ namespace git
             return d;
         }
 
+        void make_commit(const QString &author_name, const QString &author_email, const QString &message)
+        {
+            QByteArray name = author_name.toUtf8();
+            QByteArray email = author_email.toUtf8();
+            QByteArray msg = message.toUtf8();
+
+            git_oid tree_id, parent_id, commit_id;
+            git_tree *tree;
+            git_commit *parent;
+            git_index *index;
+
+            git_signature *author;
+            git_signature_now(&author, name.data(), email.data());
+
+            /* Get the index and write it to a tree */
+            git_repository_index(&index, r);
+            git_index_write_tree(&tree_id, index);
+            git_tree_lookup(&tree, r, &tree_id);
+
+            /* Get HEAD as a commit object to use as the parent of the commit */
+            git_reference_name_to_id(&parent_id, r, "HEAD");
+            git_commit_lookup(&parent, r, &parent_id);
+
+            const git_commit* parents[1];
+            parents[0] = parent;
+            git_commit_create(&commit_id, r, "HEAD", author, author, "UTF-8", msg.data(), tree, 1, parents);
+
+            git_index_read_tree(index, tree);
+
+            git_tree_free(tree);
+            git_commit_free(parent);
+            git_index_free(index);
+            git_signature_free(author);
+        }
+
     };
 
 }
