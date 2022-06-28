@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=GitLog
+Comment=git log graphical interface like TortoiseGit
+Exec=/usr/bin/GitLog
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=GitLogBlueFolder
+Categories=Development;Application;
+Encoding=UTF-8
