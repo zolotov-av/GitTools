@@ -1,1 +1,36 @@
-/GitTools.pro.user
+*.pro.user
+*.pro.user.*
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+
+# qtcreator 13.0
+/build
+
+# generated files
+Makefile
+.gi*.o
+lib*.a
+lib*.so
+lib*.so.*
+*.debug
+.qmake.stash
+*.db
+
+# vim swap files
+*.swp
+
+# debian and rpm packages
+*.deb
+*.rpm
+
+# pycharm
+.idea/
+
+# debian
+/debian/.debhelper/
+/debian/debhelper-build-stamp
+/debian/files
+/debian/vtsip.debhelper.log
+/debian/vtsip.substvars
+/debian/vtsip/
+/obj-*/
