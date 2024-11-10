@@ -1,0 +1,52 @@
+DiffWindow::DiffWindow(QWidget *parent): QMainWindow{parent}, ui{new Ui::DiffWindow}
+{
+    ui->setupUi(this);
+
+    // foo
+
+    ui->leftEditor->setFont(QFont("monospace", 16));
+    ui->leftEditor->setMarginWidth(0, 40);
+    ui->leftEditor->setMarginType(0, QsciScintilla::NumberMargin);
+    ui->rightEditor->setMarginWidth(0, 40);
+    ui->rightEditor->setMarginType(0, 123);
+}
+
+DiffWindow::~DiffWindow()
+{
+}
+
+LineView::LineView(QWindow *parent): QQuickView{parent}
+{
+    setTitle(tr("Line View"));
+    setResizeMode(QQuickView::SizeRootObjectToView);
+    resize(QSize{1200, 800});
+
+#if 0
+    const QDir repoDir {"/home/alex/prj/GitTools"};
+    const QString filePath { "DiffMerge/LineView/LineView.cpp" };
+    const QString fileAbsPath = repoDir.filePath(filePath);
+    qDebug().noquote() << "file: " << fileAbsPath;
+
+    m_repo.open(repoDir.path());
+    m_repo.config().getString("user.name");
+
+    const auto oid = m_repo.get_index().oidByPath(filePath);
+    const auto blob = m_repo.get_blob(oid.data());
+
+    QByteArray leftContent = blob.rawcontent();
+    QByteArray rightContent = loadFromFile(fileAbsPath);
+
+#else
+
+    QByteArray leftContent = loadFromFile(":/tmp/left.txt");
+    QByteArray rightContent = loadFromFile(":/tmp/right.txt");
+
+#endif
+
+    m_left_model.setContent(leftContent);
+    m_right_model.setDiff(leftContent, rightContent);
+
+    rootContext()->setContextProperty("lineView", this);
+
+    setSource(QUrl{"qrc:/qml/LineView.qml"});
+}

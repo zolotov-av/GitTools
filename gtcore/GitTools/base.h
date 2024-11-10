@@ -11,6 +11,12 @@
 namespace git
 {
 
+    inline QString errorString(int error)
+    {
+        const git_error *e = giterr_last();
+        return QString::fromUtf8(e->message);
+    }
+
     inline void check(int error)
     {
         if (error < 0)
@@ -418,6 +424,49 @@ namespace git
         }
     };
 
+
+    class index
+    {
+    private:
+
+        git_index *m_index { nullptr };
+
+    public:
+
+        constexpr index() = default;
+        index(const index &) = delete;
+        index(index &&other): m_index(other.m_index)
+        {
+            other.m_index = nullptr;
+        }
+        index(git_index *idx): m_index(idx)
+        {
+
+        }
+        ~index()
+        {
+            free();
+        }
+
+        object_id oidByPath(const QString &path)
+        {
+            const auto u8_path = path.toUtf8();
+            const auto entry = git_index_get_bypath(m_index, u8_path.constData(), 0);
+            if (entry == nullptr)
+                return { };
+
+            // Получение OID из записи
+            return { entry->id };
+        }
+
+        void free()
+        {
+            git_index_free(m_index);
+            m_index = nullptr;
+        }
+
+    };
+
     class tree
     {
     private:
@@ -718,6 +767,13 @@ namespace git
         git::config config()
         {
             return git::config{r};
+        }
+
+        index get_index() const
+        {
+            git_index *idx;
+            check( git_repository_index(&idx, r) );
+            return { idx };
         }
 
         const char* workdir() const

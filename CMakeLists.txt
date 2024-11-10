@@ -12,6 +12,7 @@ add_custom_target(GitToolsInfo SOURCES
 
 add_subdirectory(gtcore)
 add_subdirectory(GitLog)
+add_subdirectory(GitDiff)
 
 doxygen_add_docs(docs
     ${CMAKE_CURRENT_SOURCE_DIR}
