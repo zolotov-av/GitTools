@@ -23,6 +23,8 @@ add_library(gtcore STATIC
     GitTools/CreateBranchDialog.ui
     GitTools/DeleteBranchDialog.ui
     GitTools/ExceptionTooltip.ui
+    GitTools/DiffModel.h
+    GitTools/DiffModel.cpp
 )
 
 set_target_properties(gtcore PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)

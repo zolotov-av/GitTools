@@ -5,7 +5,7 @@
 #include <QColor>
 #include <QList>
 
-class LineModel: public QAbstractListModel
+class DiffModel: public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text NOTIFY textChanged FINAL)
@@ -33,13 +33,13 @@ private:
 
 public:
 
-    explicit LineModel(QObject *parent = nullptr);
-    LineModel(const LineModel &) = delete;
-    LineModel(LineModel &&) = delete;
-    ~LineModel();
+    explicit DiffModel(QObject *parent = nullptr);
+    DiffModel(const DiffModel &) = delete;
+    DiffModel(DiffModel &&) = delete;
+    ~DiffModel();
 
-    LineModel& operator = (const LineModel &) = delete;
-    LineModel& operator = (LineModel &&) = delete;
+    DiffModel& operator = (const DiffModel &) = delete;
+    DiffModel& operator = (DiffModel &&) = delete;
 
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex parent(const QModelIndex &index) const override;

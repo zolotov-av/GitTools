@@ -1,4 +1,4 @@
-#include "LineModel.h"
+#include "DiffModel.h"
 #include <QFile>
 #include <QBuffer>
 #include <QTextStream>
@@ -11,7 +11,7 @@ namespace
 
     struct PayloadData
     {
-        QList<LineModel::LineInfo> *items;
+        QList<DiffModel::LineInfo> *items;
         QStringList left;
         QStringList right;
         QColor addedColor;
@@ -20,7 +20,7 @@ namespace
 
         void append(const QString &line, QColor color)
         {
-            LineModel::LineInfo item;
+            DiffModel::LineInfo item;
             item.lineNumber = items->size() + 1;
             item.lineText = line;
             item.lineColor = color;
@@ -54,7 +54,7 @@ namespace
         return items;
     }
 
-    QString joinLines(const QList<LineModel::LineInfo> &items)
+    QString joinLines(const QList<DiffModel::LineInfo> &items)
     {
         int size = items.size();
         for(const auto &item : items)
@@ -112,17 +112,17 @@ namespace
 
 } // namespace
 
-LineModel::LineModel(QObject *parent): QAbstractListModel{parent}
+DiffModel::DiffModel(QObject *parent): QAbstractListModel{parent}
 {
 
 }
 
-LineModel::~LineModel()
+DiffModel::~DiffModel()
 {
 
 }
 
-QModelIndex LineModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex DiffModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (row < 0 || row >= m_items.size() || column != 0 || parent.isValid()) {
         return QModelIndex();
@@ -131,12 +131,12 @@ QModelIndex LineModel::index(int row, int column, const QModelIndex &parent) con
     return createIndex(row, column);
 }
 
-QModelIndex LineModel::parent(const QModelIndex &index) const
+QModelIndex DiffModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
 }
 
-int LineModel::rowCount(const QModelIndex &parent) const
+int DiffModel::rowCount(const QModelIndex &parent) const
 {
     if ( parent.isValid() )
         return 0;
@@ -144,7 +144,7 @@ int LineModel::rowCount(const QModelIndex &parent) const
     return m_items.size();
 }
 
-QVariant LineModel::data(const QModelIndex &index, int role) const
+QVariant DiffModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() < 0 || index.row() >= m_items.size()) {
         return QVariant{};
@@ -165,7 +165,7 @@ QVariant LineModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QHash<int, QByteArray> LineModel::roleNames() const
+QHash<int, QByteArray> DiffModel::roleNames() const
 {
     return {
         {LineNumberRole, "lineNumber"},
@@ -174,7 +174,7 @@ QHash<int, QByteArray> LineModel::roleNames() const
     };
 }
 
-void LineModel::loadFromFile(const QString &path)
+void DiffModel::loadFromFile(const QString &path)
 {
     beginResetModel();
     m_items.clear();
@@ -211,7 +211,7 @@ void LineModel::loadFromFile(const QString &path)
     endResetModel();
 }
 
-void LineModel::setContent(const QByteArray &data)
+void DiffModel::setContent(const QByteArray &data)
 {
     beginResetModel();
     m_items.clear();
@@ -246,7 +246,7 @@ void LineModel::setContent(const QByteArray &data)
     emit textChanged();
 }
 
-void LineModel::setLineColor(int row, QColor color)
+void DiffModel::setLineColor(int row, QColor color)
 {
     if ( row < 0 || row >= m_items.size() )
         return;
@@ -257,14 +257,14 @@ void LineModel::setLineColor(int row, QColor color)
     //emit dataChanged(modelIndex, modelIndex);
 }
 
-void LineModel::clear()
+void DiffModel::clear()
 {
     beginResetModel();
     m_items.clear();
     endResetModel();
 }
 
-void LineModel::addLine(const QString &text, QColor color)
+void DiffModel::addLine(const QString &text, QColor color)
 {
     beginInsertRows({}, m_items.size(), m_items.size());
 
@@ -279,7 +279,7 @@ void LineModel::addLine(const QString &text, QColor color)
     endInsertRows();
 }
 
-void LineModel::setDiff(const QByteArray &left, const QByteArray &right)
+void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
 {
     beginResetModel();
     m_items.clear();

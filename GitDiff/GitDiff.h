@@ -2,7 +2,7 @@
 
 #include <QQuickView>
 #include <GitTools/base.h>
-#include "LineModel.h"
+#include <GitTools/DiffModel.h>
 
 /**
  * @brief Окно GitDiff
@@ -18,7 +18,7 @@ private:
 
     QString m_old_file_name { };
     QString m_new_file_name { };
-    LineModel m_line_model { this };
+    DiffModel m_line_model { this };
 
 public:
 

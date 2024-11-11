@@ -5,8 +5,6 @@ project(GitDiff VERSION 1.0 LANGUAGES CXX)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Quick QuickControls2)
 
 add_executable(GitDiff
-    LineModel.h
-    LineModel.cpp
     GitDiff.h
     GitDiff.cpp
     main.cpp
