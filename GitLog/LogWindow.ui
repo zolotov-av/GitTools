@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>692</width>
-    <height>527</height>
+    <width>849</width>
+    <height>653</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,8 +32,23 @@
         <number>0</number>
        </property>
       </widget>
-      <widget class="QTextEdit" name="commitMessage"/>
-      <widget class="QTreeView" name="commitView"/>
+      <widget class="QQuickWidget" name="quickWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="resizeMode">
+        <enum>QQuickWidget::SizeRootObjectToView</enum>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -43,8 +58,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>692</width>
-     <height>21</height>
+     <width>849</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menurepo">
@@ -123,6 +138,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources.qrc"/>
  </resources>

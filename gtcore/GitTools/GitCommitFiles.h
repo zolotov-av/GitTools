@@ -12,7 +12,8 @@ public:
     enum Roles
     {
         fileNameRole = Qt::DisplayRole,
-        colorRole = Qt::ForegroundRole
+        colorRole = Qt::ForegroundRole,
+        statusRole = Qt::UserRole
     };
 
     GitCommitFiles(QObject *parent);
@@ -30,9 +31,8 @@ public:
     void open(git::repository *repo, const git::object_id &commit_oid);
     void open_cached(git::repository *repo);
     void open_worktree(git::repository *repo);
+    git::delta getDelta(int index);
     void close();
-
-    void execute(const QModelIndex &index);
 
 protected:
 

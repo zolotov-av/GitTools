@@ -1,11 +1,5 @@
 #include "GitCommitFiles.h"
-
-#include <QDir>
-#include <QFileInfo>
-#include <QProcess>
-#include <QDebug>
 #include <QColor>
-#include <GitTools/GitDiffProcess.h>
 
 GitCommitFiles::GitCommitFiles(QObject *parent): QAbstractItemModel(parent), active(false), commit(), diff()
 {
@@ -172,6 +166,11 @@ QVariant GitCommitFiles::data(const QModelIndex &index, int role) const
         }
     }
 
+    if ( role == statusRole )
+    {
+        return GetDiffStatus(index.row());
+    }
+
     return QVariant();
 }
 
@@ -179,7 +178,8 @@ QHash<int, QByteArray> GitCommitFiles::roleNames() const
 {
     return {
         {fileNameRole, "fileName"},
-        {colorRole, "fileColor"}
+        {colorRole, "fileColor"},
+        {statusRole, "fileStatus"}
     };
 }
 
@@ -221,83 +221,14 @@ void GitCommitFiles::open_worktree(git::repository *repo)
     endResetModel();
 }
 
+git::delta GitCommitFiles::getDelta(int index)
+{
+    return diff.get_delta(index);
+}
+
 void GitCommitFiles::close()
 {
     beginResetModel();
     active = false;
     endResetModel();
-}
-
-void GitCommitFiles::execute(const QModelIndex &index)
-{
-    if ( !index.isValid() )
-    {
-        return;
-    }
-
-    const auto delta = diff.get_delta(index.row());
-
-    switch (delta.type())
-    {
-    case GIT_DELTA_IGNORED:
-    case GIT_DELTA_UNTRACKED:
-        {
-            const QString path = QDir(repo->workdir()).filePath(delta.newFile().path());
-            if ( QFileInfo(path).isFile() )
-            {
-                const QString command = QStringLiteral("xdg-open %1").arg(path);
-                qDebug() << "GIT_DELTA_UNTRACKED:" << command;
-                QProcess::startDetached(command);
-            }
-            else
-            {
-                qDebug() << path << "is not file";
-            }
-            return;
-        }
-    default:
-        break;
-    }
-
-    const auto oldFile = delta.oldFile();
-    const auto newFile = delta.newFile();
-
-    const auto oldOid = oldFile.oid();
-    const auto newOid = newFile.oid();
-    qDebug() << "old oid[" << oldOid.toString() << "] " << oldFile.path();
-    qDebug() << "new oid[" << newOid.toString() << "] " << newFile.path();
-
-    if ( oldOid.isNull() )
-    {
-        if ( newOid.isNull() )
-        {
-            qDebug() << "unexpected old oid & new oid both is zero";
-            return;
-        }
-        else
-        {
-            const QString oldPath = QDir(repo->workdir()).filePath(delta.oldFile().path());
-            GitDiffProcess *process = new GitDiffProcess(this);
-            const git::blob newBlob = repo->get_blob(newFile.oid().data());
-            process->open(oldPath, newBlob);
-            return;
-        }
-    }
-    else
-    {
-        const git::blob oldBlob = repo->get_blob(oldFile.oid().data());
-        if ( newOid.isNull() )
-        {
-            const QString newPath = QDir(repo->workdir()).filePath(delta.newFile().path());
-            GitDiffProcess *process = new GitDiffProcess(this);
-            process->open(oldBlob, newPath);
-            return;
-        }
-        else
-        {
-            const git::blob newBlob = repo->get_blob(newFile.oid().data());
-            GitDiffProcess *process = new GitDiffProcess(this);
-            process->open(oldBlob, newBlob);
-        }
-    }
 }

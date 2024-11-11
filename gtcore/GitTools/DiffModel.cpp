@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDir>
 #include <GitTools/base.h>
 
 namespace
@@ -27,6 +28,17 @@ namespace
             items->append(std::move(item));
         }
     };
+
+    QByteArray readFromFile(const QString &filePath)
+    {
+        QFile file{filePath};
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            return { };
+        }
+
+        return file.readAll();
+    }
 
     QStringList splitLines(const QByteArray &data)
     {
@@ -314,4 +326,72 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
     }
 
     endResetModel();
+}
+
+void DiffModel::setGitDelta(git::repository *repo, git::delta delta)
+{
+
+    switch (delta.type())
+    {
+    case GIT_DELTA_IGNORED:
+    case GIT_DELTA_UNTRACKED:
+    {
+        const QString path = QDir(repo->workdir()).filePath(delta.newFile().path());
+        if ( QFileInfo(path).isFile() )
+        {
+            //const QString command = QStringLiteral("xdg-open %1").arg(path);
+            qDebug().noquote() << "GIT_DELTA_UNTRACKED";
+            //QProcess::startDetached(command);
+            setDiff(QByteArray{}, readFromFile(path));
+            return;
+        }
+        else
+        {
+            qDebug() << path << "is not file";
+        }
+        return;
+    }
+    default:
+        break;
+    }
+
+    const auto oldFile = delta.oldFile();
+    const auto newFile = delta.newFile();
+
+    const auto oldOid = oldFile.oid();
+    const auto newOid = newFile.oid();
+    qDebug().noquote() << "old oid[" << oldOid.toString() << "] " << oldFile.path();
+    qDebug().noquote() << "new oid[" << newOid.toString() << "] " << newFile.path();
+
+    if ( oldOid.isNull() )
+    {
+        if ( newOid.isNull() )
+        {
+            qDebug().noquote() << "unexpected old oid & new oid both is zero";
+            return;
+        }
+        else
+        {
+            const QString oldPath = QDir(repo->workdir()).filePath(delta.oldFile().path());
+            const git::blob newBlob = repo->get_blob(newFile.oid().data());
+            setDiff(readFromFile(oldPath), newBlob.rawcontent());
+            return;
+        }
+    }
+    else
+    {
+        const git::blob oldBlob = repo->get_blob(oldFile.oid().data());
+        if ( newOid.isNull() )
+        {
+            const QString newPath = QDir(repo->workdir()).filePath(delta.newFile().path());
+            setDiff(oldBlob.rawcontent(), readFromFile(newPath));
+            return;
+        }
+        else
+        {
+            const git::blob newBlob = repo->get_blob(newFile.oid().data());
+            setDiff(oldBlob.rawcontent(), newBlob.rawcontent());
+        }
+    }
+
 }

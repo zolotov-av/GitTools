@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/CommitDialog.qml</file>
+        <file>qml/GitLog.qml</file>
+        <file>qml/TreeViewPage.qml</file>
+        <file>qml/DiffPage.qml</file>
+        <file>qml/DiffArea.qml</file>
     </qresource>
 </RCC>
