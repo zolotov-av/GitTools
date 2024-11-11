@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QColor>
 #include <QList>
+#include <GitTools/base.h>
 
 class DiffModel: public QAbstractListModel
 {
@@ -59,6 +60,7 @@ public:
     void addLine(const QString &text, QColor color);
 
     void setDiff(const QByteArray &left, const QByteArray &right);
+    void setGitDelta(git::repository *repo, git::delta delta, bool isWorktree);
 
     QString text() { return m_text; }
 

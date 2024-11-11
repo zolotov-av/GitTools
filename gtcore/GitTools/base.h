@@ -319,6 +319,11 @@ namespace git
             other.c = nullptr;
         }
 
+        bool isEmpty() const
+        {
+            return c == nullptr;
+        }
+
         git::object_id id() const
         {
             return git_commit_id(c);

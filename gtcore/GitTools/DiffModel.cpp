@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDir>
 #include <GitTools/base.h>
 
 namespace
@@ -16,7 +17,8 @@ namespace
         QStringList right;
         QColor addedColor;
         QColor removedColor;
-        int start;
+        int left_start;
+        int right_start;
 
         void append(const QString &line, QColor color)
         {
@@ -27,6 +29,17 @@ namespace
             items->append(std::move(item));
         }
     };
+
+    QByteArray readFromFile(const QString &filePath)
+    {
+        QFile file{filePath};
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            return { };
+        }
+
+        return file.readAll();
+    }
 
     QStringList splitLines(const QByteArray &data)
     {
@@ -76,16 +89,19 @@ namespace
     int hunk_cb(const git_diff_delta *delta, const git_diff_hunk *hunk, void *payload)
     {
         const auto data = reinterpret_cast<PayloadData*>(payload);
+        qDebug().noquote() << "old_start" << hunk->old_start << hunk->old_lines
+                           << "new_start" << hunk->new_start << hunk->new_lines;
 
-        if ( hunk->old_start > data->start )
+        if ( hunk->old_start > data->left_start )
         {
-            for(int i = data->start; i <= hunk->old_start; i++)
+            for(int i = data->left_start; i <= hunk->old_start; i++)
             {
                 data->append(data->left[i-1], Qt::transparent);
             }
         }
 
-        data->start = hunk->old_start + hunk->old_lines;
+        data->left_start = hunk->old_start + hunk->old_lines;
+        data->right_start = hunk->new_start + hunk->new_lines;
 
         return 0;
     }
@@ -290,7 +306,8 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
         splitLines(right),
         addedColor(),
         removedColor(),
-        1 // start
+        1, // left_start,
+        1 // right_start
     };
 
     const auto ret = git_diff_buffers(left.constData(), left.size(), nullptr,
@@ -300,9 +317,22 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
 
     if ( ret == 0 )
     {
-        for(int i = payload.start; i <= payload.left.size(); i++)
+        if ( !left.isEmpty() )
         {
-            payload.append(payload.left[i-1], Qt::transparent);
+
+            qDebug().noquote() << "rest: " << payload.left_start << "/" << payload.left.size();
+            for(int i = payload.left_start; i <= payload.left.size(); i++)
+            {
+                payload.append(payload.left[i-1], Qt::transparent);
+            }
+        }
+        else if ( !right.isEmpty() )
+        {
+            qDebug().noquote() << "rest: " << payload.right_start << "/" << payload.right.size();
+            for(int i = payload.right_start; i <= payload.right.size(); i++)
+            {
+                payload.append(payload.right[i-1], Qt::transparent);
+            }
         }
 
         m_text = joinLines(m_items);
@@ -314,4 +344,65 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
     }
 
     endResetModel();
+}
+
+static QByteArray getData(git::repository *repo, const git::object_id &oid)
+{
+    if ( oid.isNull() )
+        return { };
+
+    const auto blob = repo->get_blob(oid.data());
+    QByteArray data = blob.rawcontent();
+    data.detach();
+    return data;
+}
+
+void DiffModel::setGitDelta(git::repository *repo, git::delta delta, bool isWorktree)
+{
+    switch (delta.type())
+    {
+    case GIT_DELTA_IGNORED:
+    case GIT_DELTA_UNTRACKED:
+    {
+        const QString path = QDir(repo->workdir()).filePath(delta.newFile().path());
+        if ( QFileInfo(path).isFile() )
+        {
+            qDebug().noquote() << "GIT_DELTA_UNTRACKED";
+            setDiff(QByteArray{}, readFromFile(path));
+            return;
+        }
+        else
+        {
+            qDebug().noquote() << path << "is not file";
+        }
+        return;
+    }
+    default:
+        break;
+    }
+
+    const auto oldFile = delta.oldFile();
+    const auto newFile = delta.newFile();
+
+    const auto oldOid = oldFile.oid();
+    const auto newOid = newFile.oid();
+    qDebug().noquote() << "old oid[" << oldOid.toString() << "] " << oldFile.path();
+    qDebug().noquote() << "new oid[" << newOid.toString() << "] " << newFile.path();
+
+    if ( isWorktree )
+    {
+        const QString path = QDir(repo->workdir()).filePath(newFile.path());
+        qDebug().noquote() << "isWorktree path:" << path;
+
+        const QByteArray oldData = getData(repo, oldOid);
+        const QByteArray newData = readFromFile(path);
+        setDiff(oldData, newData);
+    }
+    else
+    {
+        const QByteArray oldData = getData(repo, oldOid);
+        const QByteArray newData = getData(repo, newOid);
+        setDiff(oldData, newData);
+    }
+
 }

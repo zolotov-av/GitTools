@@ -10,14 +10,12 @@ add_library(gtcore STATIC
     GitTools/DeleteBranchDialog.h
     GitTools/ExceptionTooltip.h
     GitTools/GitCommitFiles.h
-    GitTools/GitDiffProcess.h
     GitTools/GitLogDelegate.h
     GitTools/GitLogModel.h
     GitTools/base.h
     GitTools/string.h
     GitTools/exception.h
     GitTools/GitCommitFiles.cpp
-    GitTools/GitDiffProcess.cpp
     GitTools/GitLogDelegate.cpp
     GitTools/GitLogModel.cpp
     GitTools/CreateBranchDialog.ui

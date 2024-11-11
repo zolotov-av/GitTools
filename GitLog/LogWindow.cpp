@@ -11,6 +11,8 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QResizeEvent>
+#include <QQmlContext>
+#include <QQuickItem>
 
 void LogWindow::closeToTray(bool was_maximized)
 {
@@ -27,6 +29,19 @@ void LogWindow::openFromTray()
     raise();
     activateWindow();
     update();
+}
+
+void LogWindow::openDiff(int index)
+{
+    qDebug().noquote() << "openDiff: " << index;
+    const auto delta = m_files_model->getDelta(index);
+    m_diff_model.setGitDelta(&repo, delta, m_files_model->isWorktree());
+}
+
+void LogWindow::closeDiff()
+{
+    qDebug().noquote() << "closeDiff";
+    m_diff_model.clear();
 }
 
 LogWindow::LogWindow(QWidget *parent) :
@@ -56,9 +71,7 @@ LogWindow::LogWindow(QWidget *parent) :
     logModel->setRepository(&repo);
     ui->logView->setModel(logModel);
 
-    filesModel = new GitCommitFiles(this);
-    ui->commitView->setModel(filesModel);
-    ui->commitView->installEventFilter(this);
+    m_files_model = new GitCommitFiles(this);
 
     connect(m_systrayIcon, &QSystemTrayIcon::activated, this, &LogWindow::systrayActivated);
     connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
@@ -69,10 +82,8 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionExit, &QAction::triggered, this, &LogWindow::exit);
     connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
     connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
-    connect(ui->commitView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fileClicked(QModelIndex)));
     connect(ui->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
     connect(ui->logView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(logViewColumnResized(int,int,int)));
-    connect(ui->commitView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(commitViewColumnResized(int,int,int)));
     connect(commitDialog, &CommitDialog::accepted, this, &LogWindow::doCommit);
 
     if ( cache->value("window/maximized", "no").toString() == "yes" )
@@ -93,20 +104,10 @@ LogWindow::LogWindow(QWidget *parent) :
     commitDialog->setAuthorName(cache->value("AuthorName").toString());
     commitDialog->setAuthorEmail(cache->value("AuthorEmail").toString());
 
-    auto header = ui->logView->header();
+    const auto header = ui->logView->header();
     for(int i = 0; i < 3; i++)
     {
         int size = cache->value(QString("LogView/size%1").arg(i), -1).toInt();
-        if ( size > 0 )
-        {
-            header->resizeSection(i, size);
-        }
-    }
-
-    header = ui->commitView->header();
-    for(int i = 0; i < 3; i++)
-    {
-        int size = cache->value(QString("CommitView/size%1").arg(i), -1).toInt();
         if ( size > 0 )
         {
             header->resizeSection(i, size);
@@ -120,12 +121,27 @@ LogWindow::LogWindow(QWidget *parent) :
     {
         openRepository(path);
     }
+
+    const auto ctx = ui->quickWidget->rootContext();
+    ctx->setContextProperty("gitlog", this);
+    ui->quickWidget->setSource(QUrl{"qrc:/qml/GitLog.qml"});
+
 }
 
 LogWindow::~LogWindow()
 {
+    ui->quickWidget->setSource({});
     delete commitDialog;
     delete ui;
+}
+
+void LogWindow::setCommitMessage(const QString &text)
+{
+    if ( m_commit_message == text )
+        return;
+
+    m_commit_message = text;
+    emit commitMessageChanged();
 }
 
 void LogWindow::update()
@@ -195,30 +211,25 @@ void LogWindow::commitSelected(const QModelIndex &index)
     if ( commit.isCommit() )
     {
         QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
-        ui->commitMessage->setText(message);
-        filesModel->open(&repo, commit.oid());
+        setCommitMessage(message);
+        m_files_model->open(&repo, commit.oid());
     }
     else if ( commit.isIndex() )
     {
-        ui->commitMessage->setText(tr("Changes to be committed"));
-        filesModel->open_cached(&repo);
+        setCommitMessage(tr("Changes to be committed"));
+        m_files_model->open_cached(&repo);
     }
     else if ( commit.isWorktree() )
     {
-        ui->commitMessage->setText(tr("Changes not staged for commit"));
-        filesModel->open_worktree(&repo);
+        setCommitMessage(tr("Changes not staged for commit"));
+        m_files_model->open_worktree(&repo);
     }
     else
     {
-        ui->commitMessage->setText(commit.message());
-        filesModel->close();
+        setCommitMessage(commit.message());
+        m_files_model->close();
     }
 
-}
-
-void LogWindow::fileClicked(const QModelIndex &index)
-{
-    filesModel->execute(index);
 }
 
 void LogWindow::splitterMoved(int, int)
@@ -231,18 +242,20 @@ void LogWindow::logViewColumnResized(int index, int, int newSize)
     cache->setValue(QString("LogView/size%1").arg(index), newSize);
 }
 
-void LogWindow::commitViewColumnResized(int index, int, int newSize)
-{
-    cache->setValue(QString("CommitView/size%1").arg(index), newSize);
-}
-
 void LogWindow::onActivate(const QModelIndex &index)
 {
     qDebug() << "activated " << index.row();
     ui->logView->clearSelection();
-    ui->commitView->setFocus();
+    //ui->commitView->setFocus();
     //ui->commitView->setCurrentIndex(filesModel->index(0, 0));
-    ui->commitView->setCurrentIndex(filesModel->index(0, 0));
+    //ui->commitView->setCurrentIndex(m_files_model->index(0, 0));
+    ui->quickWidget->setFocus();
+
+    QMetaObject::invokeMethod(
+        ui->quickWidget->rootObject(),
+        "debugMessage",
+        Q_ARG(QVariant, "test")
+        );
 }
 
 void LogWindow::on_actionCreateBranch_triggered()
@@ -292,26 +305,6 @@ void LogWindow::doCommit()
     update();
 }
 
-bool LogWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    if ( event->type() == QEvent::KeyPress )
-    {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if ( keyEvent->key() == Qt::Key_Backspace )
-        {
-            if ( obj == ui->commitView )
-            {
-                ui->logView->setFocus();
-                ui->logView->setCurrentIndex(ui->logView->currentIndex());
-                ui->commitView->clearSelection();
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 void LogWindow::resizeEvent(QResizeEvent *event)
 {
     cache->setValue("window/maximized", isMaximized() ? "yes" : "no");
@@ -352,7 +345,7 @@ void LogWindow::changeEvent(QEvent *event)
 
 void LogWindow::closeEvent(QCloseEvent *event)
 {
-    event->ignore();
+    //event->ignore();
     if ( m_minimizeTray )
     {
         closeToTray();
