@@ -9,6 +9,16 @@ class GitLogModel final: public QAbstractItemModel
 {
     Q_OBJECT
 
+public:
+
+    enum Roles
+    {
+        CommitMessageRole = Qt::UserRole,
+        CommitTimeRole,
+        AuthorNameRole,
+        AuthorEmailRole
+    };
+
 private:
 
     using GraphLane = git::GraphLane;
@@ -47,11 +57,13 @@ public:
     QModelIndex parent(const QModelIndex &child) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     bool open(const git::reference &ref);
     bool openAllRefs();
     void update();
 
+    git::CommitInfo commitInfoByIndex(int index) const;
     git::CommitInfo getCommitInfo(const QModelIndex &index) const;
 
 };

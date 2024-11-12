@@ -67,9 +67,9 @@ LogWindow::LogWindow(QWidget *parent) :
     ui->logView->addAction(ui->actionCreateBranch);
     ui->logView->addAction(ui->actionDeleteBranch);
 
-    logModel = new GitLogModel(this);
-    logModel->setRepository(&repo);
-    ui->logView->setModel(logModel);
+    m_log_model = new GitLogModel(this);
+    m_log_model->setRepository(&repo);
+    ui->logView->setModel(m_log_model);
 
     m_files_model = new GitCommitFiles(this);
 
@@ -164,11 +164,11 @@ void LogWindow::refresh(bool checked)
     {
         if ( checked )
         {
-            logModel->openAllRefs();
+            m_log_model->openAllRefs();
         }
         else
         {
-            logModel->open(repo.get_head());
+            m_log_model->open(repo.get_head());
         }
     }
 }
@@ -207,7 +207,7 @@ void LogWindow::commitSelected(const QModelIndex &index)
         return;
     }
 
-    auto commit = logModel->getCommitInfo(index);
+    auto commit = m_log_model->getCommitInfo(index);
     if ( commit.isCommit() )
     {
         QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
@@ -261,10 +261,10 @@ void LogWindow::onActivate(const QModelIndex &index)
 void LogWindow::on_actionCreateBranch_triggered()
 {
     qDebug() << "on_actionCreateBranch_triggered()";
-    auto commit = logModel->getCommitInfo(ui->logView->currentIndex());
+    auto commit = m_log_model->getCommitInfo(ui->logView->currentIndex());
 
     auto dlg = new CreateBranchDialog(this);
-    dlg->setModel(logModel);
+    dlg->setModel(m_log_model);
     dlg->setRepositiory(&repo);
     dlg->setCommitId(commit.oid().toString());
     dlg->show();
@@ -274,10 +274,10 @@ void LogWindow::on_actionCreateBranch_triggered()
 void LogWindow::on_actionDeleteBranch_triggered()
 {
     qDebug() << "on_actionDeleteBranch_triggered()";
-    auto commit = logModel->getCommitInfo(ui->logView->currentIndex());
+    auto commit = m_log_model->getCommitInfo(ui->logView->currentIndex());
 
     auto dlg = new git::DeleteBranchDialog(this);
-    dlg->setModel(logModel);
+    dlg->setModel(m_log_model);
     dlg->setCommitId(&repo, commit.oid().toString());
     dlg->show();
 

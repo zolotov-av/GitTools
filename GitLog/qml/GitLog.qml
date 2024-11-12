@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 2.15
+import GitTools 1.0
 
 Item {
     id: root
@@ -14,6 +15,12 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
+
+        LogView {
+            id: logView
+            implicitHeight: 300
+            Layout.fillWidth: true
+        }
 
         Rectangle {
             color: commitMessage.activeFocus ? "lightblue" : "lightgrey"

@@ -1,6 +1,7 @@
 #include "LogWindow.h"
 #include "DBusInterface.h"
 #include <QApplication>
+#include <GitTools/GraphItem.h>
 #include <git2.h>
 
 using namespace git;
@@ -18,6 +19,8 @@ int main(int argc, char *argv[])
         dbus.showGitLog();
         return 0;
     }
+
+    qmlRegisterType<GraphItem>("GitTools", 1, 0, "GraphItem");
 
     LogWindow w;
 

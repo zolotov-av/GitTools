@@ -93,9 +93,31 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
         default:
             return index.column() + 1;
         }
+
+        return { };
+    }
+
+    switch ( role )
+    {
+        case CommitMessageRole:
+            return history[index.row()].shortMessage();
+        case CommitTimeRole:
+            return history[index.row()].commit_time();
+        case AuthorNameRole:
+            return history[index.row()].author_name();
     }
 
     return QVariant();
+}
+
+QHash<int, QByteArray> GitLogModel::roleNames() const
+{
+    return {
+        {CommitMessageRole, "commitMessage"},
+        {CommitTimeRole, "commitTime"},
+        {AuthorNameRole, "authorName"},
+        {AuthorEmailRole, "authorEmail"}
+    };
 }
 
 bool GitLogModel::open(const git::reference &reference)
@@ -306,6 +328,14 @@ void GitLogModel::updateGraph()
 
         commit.lanes = lanes;
     }
+}
+
+git::CommitInfo GitLogModel::commitInfoByIndex(int index) const
+{
+    if ( index >= 0 && index < history.size() )
+        return history.at(index);
+
+    return { };
 }
 
 git::CommitInfo GitLogModel::getCommitInfo(const QModelIndex &index) const

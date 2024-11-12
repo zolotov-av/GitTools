@@ -6,6 +6,7 @@
 #include <QSystemTrayIcon>
 #include <GitTools/base.h>
 #include <GitTools/DiffModel.h>
+#include <GitTools/GitLogModel.h>
 #include "CommitDialog.h"
 
 namespace Ui {
@@ -21,12 +22,14 @@ class LogWindow: public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(QString commitMessage READ commitMessage WRITE setCommitMessage NOTIFY commitMessageChanged FINAL)
+    Q_PROPERTY(QAbstractItemModel* logModel READ logModel CONSTANT FINAL)
     Q_PROPERTY(QAbstractItemModel* filesModel READ filesModel CONSTANT FINAL)
     Q_PROPERTY(QAbstractItemModel* diffModel READ diffModel CONSTANT FINAL)
 
 private:
 
     QString m_commit_message;
+    GitLogModel *m_log_model { nullptr };
     DiffModel m_diff_model { this };
 
     void closeToTray()
@@ -47,6 +50,7 @@ public:
     const QString& commitMessage() const { return m_commit_message; }
     void setCommitMessage(const QString &text);
 
+    QAbstractItemModel* logModel() { return m_log_model; }
     QAbstractItemModel* filesModel() { return m_files_model; }
     QAbstractItemModel* diffModel() { return &m_diff_model; }
 
@@ -88,7 +92,6 @@ private:
     Ui::LogWindow *ui;
 
     QSettings *cache;
-    GitLogModel *logModel;
     GitLogDelegate* logDelegate;
     GitCommitFiles *m_files_model { nullptr };
     GitLogView *logView;
