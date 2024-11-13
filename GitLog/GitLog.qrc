@@ -7,5 +7,6 @@
         <file>qml/DiffArea.qml</file>
         <file>qml/LogView.qml</file>
         <file>qtquickcontrols2.conf</file>
+        <file>qml/MainWindow.qml</file>
     </qresource>
 </RCC>
