@@ -1,16 +1,16 @@
 #include "LogWindow.h"
 #include "DBusInterface.h"
 #include <QApplication>
+#include <GitTools/GitApplication.h>
 #include <GitTools/GraphItem.h>
-#include <git2.h>
 
 using namespace git;
 
 int main(int argc, char *argv[])
 {
-    git_libgit2_init();
-
     QApplication a(argc, argv);
+    GitApplication gitApp;
+
     DBusInterface dbus;
 
     if ( dbus.isRunning() )
@@ -35,9 +35,5 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    int exitCode = a.exec();
-
-    git_libgit2_shutdown();
-
-    return exitCode;
+    return a.exec();
 }

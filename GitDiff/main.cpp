@@ -1,19 +1,15 @@
 #include <QApplication>
+#include <GitTools/GitApplication.h>
 #include <git2.h>
 #include "GitDiff.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
-    git_libgit2_init();
+    GitApplication gitApp;
 
     GitDiff view;
     view.show();
 
-    int exitCode = a.exec();
-
-    git_libgit2_shutdown();
-
-    return exitCode;
+    return a.exec();
 }

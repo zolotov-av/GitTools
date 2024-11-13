@@ -25,4 +25,5 @@ set_target_properties(GitLog PROPERTIES AUTOMOC ON)
 set_target_properties(GitLog PROPERTIES AUTORCC ON)
 set_target_properties(GitLog PROPERTIES AUTOUIC ON)
 
-target_link_libraries(GitLog PRIVATE gtcore Qt5::DBus Qt5::Quick Qt5::QuickWidgets)
+target_link_libraries(GitLog PRIVATE GitCore)
+target_link_libraries(GitLog PRIVATE Qt5::DBus Qt5::Quick Qt5::QuickWidgets)

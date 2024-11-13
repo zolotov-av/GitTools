@@ -10,7 +10,7 @@ add_custom_target(GitToolsInfo SOURCES
     mainpage.dox
 )
 
-add_subdirectory(gtcore)
+add_subdirectory(GitCore)
 add_subdirectory(GitLog)
 add_subdirectory(GitDiff)
 

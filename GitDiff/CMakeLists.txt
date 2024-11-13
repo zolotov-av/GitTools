@@ -19,4 +19,5 @@ set_target_properties(GitDiff PROPERTIES AUTOMOC ON)
 set_target_properties(GitDiff PROPERTIES AUTORCC ON)
 set_target_properties(GitDiff PROPERTIES AUTOUIC OFF)
 
-target_link_libraries(GitDiff PRIVATE gtcore Qt5::Core Qt5::Gui Qt5::Quick Qt5::QuickControls2)
+target_link_libraries(GitDiff PRIVATE GitCore)
+target_link_libraries(GitDiff PRIVATE Qt5::Core Qt5::Gui Qt5::Quick Qt5::QuickControls2)
