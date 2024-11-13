@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 2.15
+import Qt.labs.platform 1.0
 import GitTools 1.0
 
 Item {
@@ -13,6 +14,16 @@ Item {
         stackView.forceActiveFocus();
     }
 
+    FolderDialog {
+        id: folderDialog
+        title: qsTr("Choose repository")
+
+        onAccepted: {
+            console.log("QML folderDialog accepted: " + folder)
+            gitlog.openRepository(folder)
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
 
@@ -21,7 +32,7 @@ Item {
 
             ToolButton {
                 text: qsTr("Open")
-                onClicked: gitlog.openRepository()
+                onClicked: folderDialog.open()
             }
 
             ToolButton {

@@ -73,7 +73,6 @@ public slots:
     void update();
     void systrayActivated(QSystemTrayIcon::ActivationReason reason);
     void refresh(bool checked);
-    void openRepository();
     void openRepository(const QString &path);
     void exit();
     void openFromTray();

@@ -52,14 +52,6 @@
     </item>
    </layout>
   </widget>
-  <action name="actionRepoOpen">
-   <property name="text">
-    <string>&amp;Open</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
-  </action>
   <action name="actionCreateBranch">
    <property name="text">
     <string>Create Branch</string>

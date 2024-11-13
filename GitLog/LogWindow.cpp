@@ -10,10 +10,8 @@
 #include <QMenu>
 #include <QDebug>
 #include <QDir>
-#include <QFileDialog>
 #include <QResizeEvent>
 #include <QQmlContext>
-#include <QQuickItem>
 
 void LogWindow::closeToTray(bool was_maximized)
 {
@@ -67,7 +65,6 @@ LogWindow::LogWindow(QWidget *parent) :
     m_files_model = new GitCommitFiles(this);
 
     connect(m_systrayIcon, &QSystemTrayIcon::activated, this, &LogWindow::systrayActivated);
-    connect(ui->actionRepoOpen, SIGNAL(triggered(bool)), this, SLOT(openRepository()));
     connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
     connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
     connect(ui->actionCommit, &QAction::triggered, this, &LogWindow::openCommitDialog);
@@ -180,21 +177,34 @@ void LogWindow::refresh(bool checked)
     }
 }
 
-void LogWindow::openRepository()
+static QString urlToLocalFile(const QString &file)
 {
-    qDebug().noquote() << "openRepository()";
-    const QString path = QFileDialog::getExistingDirectory(this, "Choose repository");
-    if ( path.isEmpty() )
-        return;
+    const QUrl url{ file };
+    if ( url.scheme().isEmpty() )
+        return file;
 
-    openRepository(path);
+    qDebug().noquote() << "url: " << url << "scheme:" << url.scheme();
+    if ( !url.isLocalFile() )
+    {
+        qDebug().noquote() << "wrong URL: " << url.scheme();
+        return { };
+    }
+
+    return url.toLocalFile();
 }
 
 void LogWindow::openRepository(const QString &path)
 {
     qDebug().noquote() << "openRepository(" << path << ")";
-    repo.open(path);
-    cache->setValue("repo/path", path);
+    if ( path.isEmpty() )
+        return;
+
+    const auto file = urlToLocalFile(path);
+    if ( file.isEmpty() )
+        return;
+
+    repo.open(file);
+    cache->setValue("repo/path", file);
     update();
 }
 
