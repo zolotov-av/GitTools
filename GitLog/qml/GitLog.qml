@@ -9,11 +9,6 @@ Item {
     property int fontSize: 18
     property string fontFamily: "Monospace"
 
-    function debugMessage(msg) {
-        console.log("QML debugMessage: " + msg.toString())
-        stackView.forceActiveFocus();
-    }
-
     FolderDialog {
         id: folderDialog
         title: qsTr("Choose repository")
@@ -37,7 +32,6 @@ Item {
 
             ToolButton {
                 text: qsTr("Refresh")
-
                 onClicked: gitlog.update()
             }
 
@@ -69,7 +63,6 @@ Item {
 
             ToolButton {
                 text: qsTr("Commit")
-
                 onClicked: gitlog.openCommitDialog()
             }
         }
