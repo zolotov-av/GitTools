@@ -1,11 +1,11 @@
 #ifndef GT_COMMIT_DIALOG_H
 #define GT_COMMIT_DIALOG_H
 
-#include <QQuickView>
-#include <QSortFilterProxyModel>
+#include <GitTools/QuickDialog.h>
 #include <GitTools/GitCommitFiles.h>
+#include <QSortFilterProxyModel>
 
-class CommitDialog final: public QQuickView
+class CommitDialog: public QuickDialog
 {
     Q_OBJECT
     Q_PROPERTY(QString authorName READ authorName WRITE setAuthorName NOTIFY authorNameChanged FINAL)
@@ -22,7 +22,7 @@ private:
 
 public:
 
-    explicit CommitDialog(QWindow *parent = nullptr);
+    explicit CommitDialog(QQmlEngine *parent = nullptr);
     CommitDialog(const CommitDialog &) = delete;
     CommitDialog(CommitDialog &&) = delete;
 

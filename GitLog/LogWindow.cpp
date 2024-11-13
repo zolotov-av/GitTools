@@ -1,5 +1,4 @@
 #include "LogWindow.h"
-#include "ui_LogWindow.h"
 
 #include <GitTools/GitLogModel.h>
 #include <GitTools/GitCommitFiles.h>
@@ -12,6 +11,7 @@
 #include <QDir>
 #include <QResizeEvent>
 #include <QQmlContext>
+#include <QQmlComponent>
 
 void LogWindow::openDiff(int index)
 {
@@ -36,11 +36,6 @@ LogWindow::LogWindow(QWidget *parent): QObject{parent}
 
     m_files_model = new GitCommitFiles(this);
 
-    connect(commitDialog, &CommitDialog::accepted, this, &LogWindow::doCommit);
-
-    commitDialog->setAuthorName(cache->value("AuthorName").toString());
-    commitDialog->setAuthorEmail(cache->value("AuthorEmail").toString());
-
     const QString path = configValue("repo/path", "").toString();
     if ( !path.isEmpty() )
     {
@@ -54,10 +49,16 @@ LogWindow::LogWindow(QWidget *parent): QObject{parent}
     {
         qDebug().noquote() << "ERROR: m_qml_engine.rootObjects().isEmpty()";
     }
+
+    commitDialog = new CommitDialog(&m_qml_engine);
+    commitDialog->setAuthorName(cache->value("AuthorName").toString());
+    commitDialog->setAuthorEmail(cache->value("AuthorEmail").toString());
+    connect(commitDialog, &CommitDialog::accepted, this, &LogWindow::doCommit);
 }
 
 LogWindow::~LogWindow()
 {
+    commitDialog->unload();
     delete commitDialog;
 }
 
@@ -234,6 +235,22 @@ void LogWindow::on_actionDeleteBranch_triggered()
 
 void LogWindow::openCommitDialog()
 {
+    /*
+    QQmlComponent component(&m_qml_engine, QUrl{"qrc:/qml/TestDialog.qml"});
+    if (component.status() == QQmlComponent::Ready)
+    {
+        QObject *dialog = component.create(m_qml_engine.rootContext());
+        if (dialog)
+        {
+            // Устанавливаем parent для корректного удаления
+            dialog->setParent(this);
+            //return dialog;
+            return;
+        }
+    }
+    qWarning() << "Failed to create dialog:" << component.errorString();
+    //return nullptr;
+    */
     {
         git::config cfg { repo.r };
         commitDialog->setAuthorName(cfg.getString("user.name"));

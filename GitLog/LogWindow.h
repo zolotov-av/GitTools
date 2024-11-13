@@ -37,7 +37,7 @@ private:
     bool m_show_all_branches { false };
     bool m_show_tags { false };
     int m_current_commit_index { -1 };
-    QString m_commit_message;
+    QString m_commit_message { "some text" };
     GitLogModel *m_log_model { nullptr };
     DiffModel m_diff_model { this };
 
@@ -91,7 +91,7 @@ private:
     QSettings *cache;
     GitCommitFiles *m_files_model { nullptr };
     GitLogView *logView;
-    CommitDialog *commitDialog { new CommitDialog(nullptr) };
+    CommitDialog *commitDialog { nullptr };
 
     git::repository repo;
 

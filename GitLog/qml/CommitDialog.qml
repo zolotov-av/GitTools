@@ -1,8 +1,16 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.0
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
 
-Item {
+ApplicationWindow {
+    id: window
+    title: qsTr("Test Dialog")
+    width: 500
+    height: 600
+    modality: Qt.ApplicationModal
+    flags: Qt.Dialog
+    //visible: true
 
     ColumnLayout {
 
@@ -11,6 +19,7 @@ Item {
 
         GridLayout {
             columns: 2
+            Layout.fillWidth: true
 
             Label {
                 text: qsTr("Author:")
@@ -41,6 +50,7 @@ Item {
 
         TextArea {
             placeholderText: qsTr("Enter description")
+            Layout.fillWidth: true
         }
 
         Label {

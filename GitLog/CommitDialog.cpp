@@ -1,15 +1,12 @@
 #include "CommitDialog.h"
 #include <QQmlContext>
 
-CommitDialog::CommitDialog(QWindow *parent): QQuickView{parent}
+CommitDialog::CommitDialog(QQmlEngine *parent): QuickDialog{parent}
 {
-    setResizeMode(QQuickView::SizeRootObjectToView);
-    resize(QSize{400, 600});
-
-    const auto ctx = rootContext();
+    const auto ctx = context();
     ctx->setContextProperty("form", this);
     ctx->setContextProperty("filesModel", &m_proxy_model);
-    setSource(QUrl{"qrc:/qml/CommitDialog.qml"});
+    load(parent, QUrl{"qrc:/qml/CommitDialog.qml"});
 }
 
 void CommitDialog::setAuthorName(const QString &name)
@@ -61,7 +58,6 @@ void CommitDialog::setFiles(git::repository *repo)
 
 void CommitDialog::exec()
 {
-    setModality(Qt::ApplicationModal);
     show();
 }
 

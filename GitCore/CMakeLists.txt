@@ -28,6 +28,7 @@ add_library(GitCore STATIC
     GitTools/DiffModel.h
     GitTools/DiffModel.cpp
     GitCoreResources.qrc
+    GitTools/QuickDialog.h GitTools/QuickDialog.cpp
 )
 
 set_target_properties(GitCore PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
