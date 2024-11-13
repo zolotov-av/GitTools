@@ -21,6 +21,7 @@ class GitLogDelegate;
 class LogWindow: public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(int currentCommitIndex READ currentCommitIndex WRITE setCurrentCommitIndex NOTIFY currentCommitChanged FINAL)
     Q_PROPERTY(QString commitMessage READ commitMessage WRITE setCommitMessage NOTIFY commitMessageChanged FINAL)
     Q_PROPERTY(QAbstractItemModel* logModel READ logModel CONSTANT FINAL)
     Q_PROPERTY(QAbstractItemModel* filesModel READ filesModel CONSTANT FINAL)
@@ -28,6 +29,7 @@ class LogWindow: public QMainWindow
 
 private:
 
+    int m_current_commit_index { -1 };
     QString m_commit_message;
     GitLogModel *m_log_model { nullptr };
     DiffModel m_diff_model { this };
@@ -47,6 +49,8 @@ public:
     LogWindow& operator = (const LogWindow &) = delete;
     LogWindow& operator = (LogWindow &&) = delete;
 
+    int currentCommitIndex() const { return m_current_commit_index; }
+    void setCurrentCommitIndex(int idx);
     const QString& commitMessage() const { return m_commit_message; }
     void setCommitMessage(const QString &text);
 
@@ -60,22 +64,15 @@ public slots:
 
     void systrayActivated(QSystemTrayIcon::ActivationReason reason);
     void refresh(bool checked);
-    void displayTagsToggled(bool checked);
     void openRepository();
     void openRepository(const QString &path);
     void exit();
     void openFromTray();
+    void showCommit(int index);
     void openDiff(int index);
     void closeDiff();
 
 private slots:
-
-    void commitSelected(const QModelIndex &index);
-
-    void splitterMoved(int pos, int index);
-    void logViewColumnResized(int index, int oldSize, int newSize);
-
-    void onActivate(const QModelIndex &index);
 
     void on_actionCreateBranch_triggered();
     void on_actionDeleteBranch_triggered();
@@ -92,7 +89,6 @@ private:
     Ui::LogWindow *ui;
 
     QSettings *cache;
-    GitLogDelegate* logDelegate;
     GitCommitFiles *m_files_model { nullptr };
     GitLogView *logView;
     CommitDialog *commitDialog { new CommitDialog(nullptr) };
@@ -107,6 +103,7 @@ private:
 
 signals:
 
+    void currentCommitChanged();
     void commitMessageChanged();
 
 };

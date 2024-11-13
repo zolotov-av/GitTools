@@ -4,14 +4,15 @@ import QtQuick.Controls 2.15
 import GitTools 1.0
 
 Rectangle {
-    color: "antiquewhite"
-    border.color: "red"
-    border.width: 1
+    color: logView.activeFocus ? "lightblue" : "lightgrey"
     clip: true
+
+    property alias currentIndex: logView.currentIndex
 
     ListView {
         id: logView
         model: gitlog.logModel
+        activeFocusOnTab: true
         anchors.fill: parent
 
         delegate: Item {
@@ -40,6 +41,31 @@ Rectangle {
                 }
             }
 
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    logView.currentIndex = index;
+                    gitlog.showCommit(index);
+                    logView.forceActiveFocus();
+                }
+
+                onDoubleClicked: {
+                    logView.currentIndex = index;
+                    logView.activeItem(index);
+                }
+            }
+        }
+
+        highlight: Item {
+
+            Rectangle {
+                x: 0
+                y: 0
+                height: parent.height
+                width: logView.width
+                color: "cornflowerblue"
+                radius: 5
+            }
         }
 
     }

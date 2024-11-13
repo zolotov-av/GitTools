@@ -60,16 +60,8 @@ LogWindow::LogWindow(QWidget *parent) :
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
 
-    logDelegate = new GitLogDelegate(this);
-    logDelegate->setDisplayTags(ui->actionDisplayTags->isChecked());
-    //logDelegate->setLaneHeight(fontMetrics().height());
-    ui->logView->setItemDelegate(logDelegate);
-    ui->logView->addAction(ui->actionCreateBranch);
-    ui->logView->addAction(ui->actionDeleteBranch);
-
     m_log_model = new GitLogModel(this);
     m_log_model->setRepository(&repo);
-    ui->logView->setModel(m_log_model);
 
     m_files_model = new GitCommitFiles(this);
 
@@ -78,12 +70,7 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->actionAllBranches, &QAction::toggled, this, &LogWindow::refresh);
     connect(ui->actionRefresh, &QAction::triggered, this, &LogWindow::refresh);
     connect(ui->actionCommit, &QAction::triggered, this, &LogWindow::openCommitDialog);
-    connect(ui->actionDisplayTags, &QAction::toggled, this, &LogWindow::displayTagsToggled);
     connect(ui->actionExit, &QAction::triggered, this, &LogWindow::exit);
-    connect(ui->logView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(commitSelected(QModelIndex)));
-    connect(ui->logView, SIGNAL(activated(QModelIndex)), this, SLOT(onActivate(QModelIndex)));
-    connect(ui->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
-    connect(ui->logView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(logViewColumnResized(int,int,int)));
     connect(commitDialog, &CommitDialog::accepted, this, &LogWindow::doCommit);
 
     if ( cache->value("window/maximized", "no").toString() == "yes" )
@@ -104,20 +91,8 @@ LogWindow::LogWindow(QWidget *parent) :
     commitDialog->setAuthorName(cache->value("AuthorName").toString());
     commitDialog->setAuthorEmail(cache->value("AuthorEmail").toString());
 
-    const auto header = ui->logView->header();
-    for(int i = 0; i < 3; i++)
-    {
-        int size = cache->value(QString("LogView/size%1").arg(i), -1).toInt();
-        if ( size > 0 )
-        {
-            header->resizeSection(i, size);
-        }
-    }
-
-    ui->splitter->restoreState(cache->value("window/splitter").toByteArray());
-
     QString path = cache->value("repo/path", "").toString();
-    if ( path != "" )
+    if ( !path.isEmpty() )
     {
         openRepository(path);
     }
@@ -125,7 +100,6 @@ LogWindow::LogWindow(QWidget *parent) :
     const auto ctx = ui->quickWidget->rootContext();
     ctx->setContextProperty("gitlog", this);
     ui->quickWidget->setSource(QUrl{"qrc:/qml/GitLog.qml"});
-
 }
 
 LogWindow::~LogWindow()
@@ -133,6 +107,15 @@ LogWindow::~LogWindow()
     ui->quickWidget->setSource({});
     delete commitDialog;
     delete ui;
+}
+
+void LogWindow::setCurrentCommitIndex(int idx)
+{
+    if ( m_current_commit_index == idx )
+        return;
+
+    m_current_commit_index = idx;
+    emit currentCommitChanged();
 }
 
 void LogWindow::setCommitMessage(const QString &text)
@@ -173,12 +156,6 @@ void LogWindow::refresh(bool checked)
     }
 }
 
-void LogWindow::displayTagsToggled(bool checked)
-{
-    logDelegate->setDisplayTags(checked);
-    update();
-}
-
 void LogWindow::openRepository()
 {
     qDebug() << "openRepository";
@@ -200,14 +177,12 @@ void LogWindow::exit()
     qApp->quit();
 }
 
-void LogWindow::commitSelected(const QModelIndex &index)
-{
-    if ( !index.isValid() )
-    {
-        return;
-    }
 
-    auto commit = m_log_model->getCommitInfo(index);
+void LogWindow::showCommit(int index)
+{
+    setCurrentCommitIndex(index);
+
+    const auto commit = m_log_model->commitInfoByIndex(index);
     if ( commit.isCommit() )
     {
         QString message = QString("SHA-1: %1\n\n%2").arg(commit.oid().toString()).arg(commit.message());
@@ -229,39 +204,12 @@ void LogWindow::commitSelected(const QModelIndex &index)
         setCommitMessage(commit.message());
         m_files_model->close();
     }
-
-}
-
-void LogWindow::splitterMoved(int, int)
-{
-    cache->setValue("window/splitter", ui->splitter->saveState());
-}
-
-void LogWindow::logViewColumnResized(int index, int, int newSize)
-{
-    cache->setValue(QString("LogView/size%1").arg(index), newSize);
-}
-
-void LogWindow::onActivate(const QModelIndex &index)
-{
-    qDebug() << "activated " << index.row();
-    ui->logView->clearSelection();
-    //ui->commitView->setFocus();
-    //ui->commitView->setCurrentIndex(filesModel->index(0, 0));
-    //ui->commitView->setCurrentIndex(m_files_model->index(0, 0));
-    ui->quickWidget->setFocus();
-
-    QMetaObject::invokeMethod(
-        ui->quickWidget->rootObject(),
-        "debugMessage",
-        Q_ARG(QVariant, "test")
-        );
 }
 
 void LogWindow::on_actionCreateBranch_triggered()
 {
     qDebug() << "on_actionCreateBranch_triggered()";
-    auto commit = m_log_model->getCommitInfo(ui->logView->currentIndex());
+    const auto commit = m_log_model->commitInfoByIndex(currentCommitIndex());
 
     auto dlg = new CreateBranchDialog(this);
     dlg->setModel(m_log_model);
@@ -274,7 +222,7 @@ void LogWindow::on_actionCreateBranch_triggered()
 void LogWindow::on_actionDeleteBranch_triggered()
 {
     qDebug() << "on_actionDeleteBranch_triggered()";
-    auto commit = m_log_model->getCommitInfo(ui->logView->currentIndex());
+    const auto commit = m_log_model->commitInfoByIndex(currentCommitIndex());
 
     auto dlg = new git::DeleteBranchDialog(this);
     dlg->setModel(m_log_model);
