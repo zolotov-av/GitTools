@@ -16,6 +16,53 @@ Item {
     ColumnLayout {
         anchors.fill: parent
 
+        RowLayout {
+            id: buttons
+
+            ToolButton {
+                text: qsTr("Open")
+                onClicked: gitlog.openRepository()
+            }
+
+            ToolButton {
+                text: qsTr("Refresh")
+
+                onClicked: gitlog.update()
+            }
+
+            ToolButton {
+                id: showAllBranches
+                text: qsTr("All branches")
+                checkable: true
+                checked: false
+
+                Binding {
+                    target: gitlog
+                    property: "showAllBranches"
+                    value: showAllBranches.checked
+                }
+            }
+
+            ToolButton {
+                id: showTags
+                text: qsTr("Display tags")
+                checkable: true
+                checked: false
+
+                Binding {
+                    target: gitlog
+                    property: "showTags"
+                    value: showTags.checked
+                }
+            }
+
+            ToolButton {
+                text: qsTr("Commit")
+
+                onClicked: gitlog.openCommitDialog()
+            }
+        }
+
         LogView {
             id: logView
             implicitHeight: 300

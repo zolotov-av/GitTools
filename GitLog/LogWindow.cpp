@@ -7,6 +7,7 @@
 #include <GitTools/CreateBranchDialog.h>
 #include <GitTools/DeleteBranchDialog.h>
 
+#include <QMenu>
 #include <QDebug>
 #include <QDir>
 #include <QFileDialog>
@@ -109,6 +110,28 @@ LogWindow::~LogWindow()
     delete ui;
 }
 
+void LogWindow::setShowAllBranches(bool value)
+{
+    if ( m_show_all_branches == value )
+        return;
+
+    m_show_all_branches = value;
+    emit showAllBranchesChanged();
+
+    update();
+}
+
+void LogWindow::setShowTags(bool value)
+{
+    if ( m_show_tags == value )
+        return;
+
+    m_show_tags = value;
+    emit showTagsChanged();
+
+    update();
+}
+
 void LogWindow::setCurrentCommitIndex(int idx)
 {
     if ( m_current_commit_index == idx )
@@ -129,7 +152,8 @@ void LogWindow::setCommitMessage(const QString &text)
 
 void LogWindow::update()
 {
-    refresh(ui->actionAllBranches->isChecked());
+    qDebug().noquote() << "LogWindow::update()";
+    refresh(m_show_all_branches);
 }
 
 void LogWindow::systrayActivated(QSystemTrayIcon::ActivationReason reason)
@@ -158,14 +182,17 @@ void LogWindow::refresh(bool checked)
 
 void LogWindow::openRepository()
 {
-    qDebug() << "openRepository";
-    QString path = QFileDialog::getExistingDirectory(this, "Choose repository");
+    qDebug().noquote() << "openRepository()";
+    const QString path = QFileDialog::getExistingDirectory(this, "Choose repository");
+    if ( path.isEmpty() )
+        return;
 
     openRepository(path);
 }
 
 void LogWindow::openRepository(const QString &path)
 {
+    qDebug().noquote() << "openRepository(" << path << ")";
     repo.open(path);
     cache->setValue("repo/path", path);
     update();

@@ -6,5 +6,6 @@
         <file>qml/DiffPage.qml</file>
         <file>qml/DiffArea.qml</file>
         <file>qml/LogView.qml</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>

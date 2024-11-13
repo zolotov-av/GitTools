@@ -52,40 +52,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>849</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menurepo">
-    <property name="title">
-     <string>&amp;Repo</string>
-    </property>
-    <addaction name="actionRepoOpen"/>
-    <addaction name="actionRefresh"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
-   </widget>
-   <addaction name="menurepo"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionAllBranches"/>
-   <addaction name="actionDisplayTags"/>
-   <addaction name="actionRefresh"/>
-   <addaction name="separator"/>
-   <addaction name="actionCommit"/>
-  </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRepoOpen">
    <property name="text">
     <string>&amp;Open</string>

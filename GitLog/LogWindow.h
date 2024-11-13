@@ -21,6 +21,8 @@ class GitLogDelegate;
 class LogWindow: public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(bool showAllBranches READ showAllBranches WRITE setShowAllBranches NOTIFY showAllBranchesChanged FINAL)
+    Q_PROPERTY(bool showTags READ showTags WRITE setShowTags NOTIFY showTagsChanged FINAL)
     Q_PROPERTY(int currentCommitIndex READ currentCommitIndex WRITE setCurrentCommitIndex NOTIFY currentCommitChanged FINAL)
     Q_PROPERTY(QString commitMessage READ commitMessage WRITE setCommitMessage NOTIFY commitMessageChanged FINAL)
     Q_PROPERTY(QAbstractItemModel* logModel READ logModel CONSTANT FINAL)
@@ -29,6 +31,8 @@ class LogWindow: public QMainWindow
 
 private:
 
+    bool m_show_all_branches { false };
+    bool m_show_tags { false };
     int m_current_commit_index { -1 };
     QString m_commit_message;
     GitLogModel *m_log_model { nullptr };
@@ -41,6 +45,7 @@ private:
     void closeToTray(bool was_maximized);
 
 public:
+
     explicit LogWindow(QWidget *parent = 0);
     LogWindow(const LogWindow &) = delete;
     LogWindow(LogWindow &&) = delete;
@@ -48,6 +53,11 @@ public:
 
     LogWindow& operator = (const LogWindow &) = delete;
     LogWindow& operator = (LogWindow &&) = delete;
+
+    bool showAllBranches() const { return m_show_all_branches; }
+    void setShowAllBranches(bool value);
+    bool showTags() const { return m_show_tags; }
+    void setShowTags(bool value);
 
     int currentCommitIndex() const { return m_current_commit_index; }
     void setCurrentCommitIndex(int idx);
@@ -58,10 +68,9 @@ public:
     QAbstractItemModel* filesModel() { return m_files_model; }
     QAbstractItemModel* diffModel() { return &m_diff_model; }
 
-    void update();
-
 public slots:
 
+    void update();
     void systrayActivated(QSystemTrayIcon::ActivationReason reason);
     void refresh(bool checked);
     void openRepository();
@@ -71,12 +80,12 @@ public slots:
     void showCommit(int index);
     void openDiff(int index);
     void closeDiff();
+    void openCommitDialog();
 
 private slots:
 
     void on_actionCreateBranch_triggered();
     void on_actionDeleteBranch_triggered();
-    void openCommitDialog();
     void doCommit();
 
 protected:
@@ -103,6 +112,8 @@ private:
 
 signals:
 
+    void showAllBranchesChanged();
+    void showTagsChanged();
     void currentCommitChanged();
     void commitMessageChanged();
 
