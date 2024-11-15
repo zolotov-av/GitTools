@@ -103,6 +103,8 @@ QVariant GitLogModel::data(const QModelIndex &index, int role) const
             return history[index.row()].shortMessage();
         case CommitTimeRole:
             return history[index.row()].commit_time();
+        case CommitRefsRole:
+            return QVariant::fromValue<QObject*>(history[index.row()].refsModel());
         case AuthorNameRole:
             return history[index.row()].author_name();
     }
@@ -115,6 +117,7 @@ QHash<int, QByteArray> GitLogModel::roleNames() const
     return {
         {CommitMessageRole, "commitMessage"},
         {CommitTimeRole, "commitTime"},
+        {CommitRefsRole, "commitRefs"},
         {AuthorNameRole, "authorName"},
         {AuthorEmailRole, "authorEmail"}
     };
@@ -138,6 +141,7 @@ bool GitLogModel::open(const git::reference &reference)
         history.append(commit);
     }
 
+    updateCommitRefs();
     updateGraph();
 
     endResetModel();
@@ -176,6 +180,7 @@ bool GitLogModel::openAllRefs()
         history.append(commit);
     }
 
+    updateCommitRefs();
     updateGraph();
 
     endResetModel();
@@ -217,6 +222,23 @@ void GitLogModel::updateRefs()
         }
 
         git_reference_iterator_free(iter);
+    }
+}
+
+void GitLogModel::updateCommitRefs()
+{
+    for(git::CommitInfo &commit : history)
+    {
+        if ( !commit.isCommit() )
+            continue;
+
+        for(auto &ref : m_refs)
+        {
+            if ( ref.target == commit.oid() )
+            {
+                commit.refsModel()->append(ref);
+            }
+        }
     }
 }
 

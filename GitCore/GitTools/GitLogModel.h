@@ -15,6 +15,7 @@ public:
     {
         CommitMessageRole = Qt::UserRole,
         CommitTimeRole,
+        CommitRefsRole,
         AuthorNameRole,
         AuthorEmailRole
     };
@@ -30,6 +31,7 @@ private:
 
     void clear();
     void updateRefs();
+    void updateCommitRefs();
     void updateGraph();
 
 public:

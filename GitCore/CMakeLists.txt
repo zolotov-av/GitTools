@@ -7,6 +7,8 @@ find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Quick)
 add_library(GitCore STATIC
     GitTools/GitApplication.h
     GitTools/GitApplication.cpp
+    GitTools/CommitRefsModel.h
+    GitTools/CommitRefsModel.cpp
     GitTools/CommitInfo.h
     GitTools/CreateBranchDialog.h
     GitTools/DeleteBranchDialog.h
