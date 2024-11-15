@@ -20,7 +20,15 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    qmlRegisterType<GraphItem>("GitTools", 1, 0, "GraphItem");
+    constexpr auto GitToolsModName = "GitTools";
+    constexpr int GitToolsVerMajor = 1;
+    constexpr int GitToolsVerMinor = 0;
+    // @uri GitTools
+    qmlRegisterModule(GitToolsModName, GitToolsVerMajor, GitToolsVerMinor);
+    qmlRegisterType<GraphItem>(GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "GraphItem");
+    qmlRegisterType(QUrl{"qrc:/qml/LineInput.qml"}, GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "LineInput");
+    qmlRegisterType(QUrl{"qrc:/qml/MultiLineInput.qml"}, GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "MultiLineInput");
+    qmlRegisterSingletonType(QUrl{"qrc:/qml/GitTheme.qml"}, GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "GitTheme");
 
     LogWindow w;
 

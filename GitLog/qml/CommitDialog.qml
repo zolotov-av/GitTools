@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
+import GitTools 1.0
 
 ApplicationWindow {
     id: window
@@ -16,76 +17,71 @@ ApplicationWindow {
 
         anchors.fill: parent
         anchors.margins: 10
+        spacing: 12
 
-        GridLayout {
-            columns: 2
+        LineInput {
+            label: qsTr("Author")
+            placeholderText: qsTr("Enter name")
+            text: form.authorName
             Layout.fillWidth: true
-
-            Label {
-                text: qsTr("Author:")
-                Layout.alignment: Qt.AlignRight
-            }
-
-            TextField {
-                text: form.authorName
-                placeholderText: qsTr("Enter name")
-                Layout.fillWidth: true
-            }
-
-            Label {
-                text: qsTr("E-mail:")
-                Layout.alignment: Qt.AlignRight
-            }
-
-            TextField {
-                text: form.authorEmail
-                placeholderText: qsTr("Enter e-mail")
-                Layout.fillWidth: true
-            }
         }
 
-        Label {
-            text: qsTr("Message:")
+        LineInput {
+            label: qsTr("E-mail")
+            placeholderText: qsTr("Enter e-mail")
+            text: form.authorEmail
+            Layout.fillWidth: true
         }
 
-        TextArea {
+        MultiLineInput {
+            label: qsTr("Message")
             placeholderText: qsTr("Enter description")
             Layout.fillWidth: true
+            Layout.fillHeight: true
         }
 
-        Label {
-            text: qsTr("Files:")
-        }
-
-        Frame {
-            clip: true
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 4
 
-            ListView {
+            Label {
+                text: qsTr("Files:")
+                font.bold: true
+                font.pixelSize: GitTheme.smallerFont
+            }
 
-                id: lv
-                anchors.fill: parent
+            Frame {
+                clip: true
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                model: filesModel
+                ListView {
 
-                delegate: Item {
+                    id: lv
+                    anchors.fill: parent
 
-                    implicitHeight: txt.implicitHeight
-                    width: lv.width
+                    model: filesModel
 
-                    Item {
-                        height: txt.implicitHeight
-                        width: parent.width
-                        Text {
-                            id: txt
-                            text: fileName
-                            color: fileColor
+                    delegate: Item {
+
+                        implicitHeight: txt.implicitHeight
+                        width: lv.width
+
+                        Item {
+                            height: txt.implicitHeight
+                            width: parent.width
+                            Text {
+                                id: txt
+                                text: fileName
+                                color: fileColor
+                            }
                         }
                     }
                 }
             }
         }
+
 
         RowLayout {
             id: buttons
